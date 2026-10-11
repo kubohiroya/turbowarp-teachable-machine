@@ -69,7 +69,7 @@ That download, and the artifact a composite runtime fetches, is the version-pinn
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.0/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.1/dist/tm.js
 ```
 
 The standalone extension loads one reviewed browser runtime that contains one TensorFlow.js 4.22.0
@@ -81,13 +81,13 @@ Composite runtimes can load or embed the same artifact without rewriting a minif
 bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.0/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.1/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.0
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.1
 ```
 
 ### Offline PoseNet bundle API
@@ -465,6 +465,12 @@ hold only its top 240 rows, so a quarter of the subject's height never reached i
 opcodes and the composition API are unchanged, and a project needs no edit — but a pose model
 will see a subject it was not seeing before, which is the point.
 
+3.5.1 fixes what image models are fed. Image mode handed `predict` the camera's video element
+without asking for mirroring, so the model saw unmirrored pixels while Teachable Machine had
+trained it on a preview mirrored in CSS. The square it sees was already the frame's centre crop;
+only the mirroring was missing, and pose and image mode now feed the same square the same way
+round. Pose recognition is unchanged.
+
 Leasing is fixed in 3.4.1. In 3.4.0 a leased start threw `Webcam canvas does not provide a 2D
 context` and recognition never began, because the upstream camera helper builds its readback canvas
 in the same branch that opens the device — the branch a supplied element skips. Use 3.4.1 wherever
@@ -493,9 +499,9 @@ recognition and the camera when the project no longer needs them.
 
 The `poseOverlay` feature flag is **on by default** for the standalone TurboWarp extension, adding
 blocks for overlay visibility, per-joint circle color/opacity/radius, shared bone
-color/opacity/width, minimum keypoint confidence, and confidence scaling. The overlay uses a
-`320 × 240` SVG coordinate system matching the camera input and follows all six preview positions
-and preview mirroring. The Composition API enables this isolated overlay layer directly.
+color/opacity/width, minimum keypoint confidence, and confidence scaling. The overlay's SVG coordinate system is the
+camera frame's own, so it follows a camera of any resolution or aspect ratio, and it honours all
+six preview positions and preview mirroring. The Composition API enables this isolated overlay layer directly.
 
 Confidence scaling can be switched independently for joint opacity, joint radius, bone opacity,
 and bone width. Joint properties use the corresponding keypoint confidence; bone properties use

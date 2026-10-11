@@ -463,6 +463,21 @@ context` and recognition never began, because the upstream camera helper builds 
 in the same branch that opens the device — the branch a supplied element skips. Use 3.4.1 wherever
 Camera Source is loaded; 3.4.0 is unaffected only when it is not.
 
+## Camera preview and what the model sees
+
+The preview on the stage is the camera's own video element, at the camera's resolution and aspect
+ratio. It used to be a 320×240 readback canvas scaled to fit, so a 1080p camera looked like a
+320×240 one and a 16:9 camera was shown in a 4:3 window.
+
+The model is fed a square centre crop of the frame, mirrored, as a tensor. `fromPixels` uploads
+the video to a texture on the WebGL and WebGPU backends and the crop and mirroring are tensor ops,
+so no Canvas2D stage sits between the camera and the model. The square also makes PoseNet's
+padding zero, where the old 4:3 canvas was padded back to square and left the subject about 25%
+smaller than the frames the model was trained on. The crop is the whole square now: the readback
+canvas held only its top 240 rows and discarded the rest.
+
+The pose overlay spans the preview and its keypoints are in the camera frame's own coordinates.
+
 The extension performs pose, image, or audio classification in the browser and does not upload
 camera frames or microphone audio. It does fetch its runtime libraries and the published model. Stop
 recognition and the camera when the project no longer needs them.

@@ -10,15 +10,22 @@ export declare const CAMERA_FRAME_WIDTH = 320;
 export declare const CAMERA_FRAME_HEIGHT = 240;
 export declare const BLOCK_ICON_URI: string;
 export type RecognitionMode = 'pose' | 'image' | 'audio';
+/** Where the square the model saw sits inside the camera's frame. */
+export interface PoseCropWindow {
+    readonly left: number;
+    readonly top: number;
+    readonly size: number;
+}
 /**
- * Put keypoints where the preview shows them.
+ * Put keypoints where the preview shows them: in the camera frame's own space.
  *
- * The model now sees a square crop at the camera's own resolution, so its keypoints come back in
- * that square's space. The overlay draws over the 320-wide readback canvas, which holds the same
- * crop scaled to 320. One factor carries one space into the other; the keypoints below the
- * canvas's 240 rows fall outside its viewBox, exactly as they did when the crop was drawn there.
+ * The model sees a square centre crop with the pixels mirrored, so a keypoint comes back measured
+ * from the mirrored square's left edge. Undoing the mirror and adding the crop's offset puts it
+ * back on the frame, which is what the preview shows and what the overlay's viewBox spans. The
+ * preview's own mirroring is a CSS transform over both the video and the overlay, so these
+ * coordinates stay in frame space either way.
  */
-export declare function scaleKeypointsToPreview(keypoints: unknown, size: number): unknown;
+export declare function mapKeypointsToFrame(keypoints: unknown, crop: PoseCropWindow): unknown;
 export interface TeachableMachineRuntime {
     Webcam: new (width: number, height: number, flipHorizontal: boolean) => any;
     load?(modelURL: string, metadataURL: string): Promise<any>;
@@ -240,7 +247,24 @@ export declare class TMExtension {
     clearPoseOverlay(): void;
     redrawPoseOverlay(): void;
     renderPoseOverlay(keypoints: unknown): void;
+    /**
+     * The element the stage shows.
+     *
+     * The camera's own video, when there is one: it carries the camera's resolution and its aspect,
+     * so the preview stops being a 320x240 readback canvas stretched to fit. The canvas remains the
+     * preview only where there is no video to show, which is the same place inference falls back to
+     * it.
+     */
+    previewSourceElement(): any;
     attachPreviewToStage(): void;
+    /**
+     * Span the overlay over what the preview is showing.
+     *
+     * Keypoints are in the camera frame's space, so the viewBox has to be the frame -- the video's
+     * own width and height, not the readback canvas's fixed 320x240. On the canvas fallback the two
+     * are the same thing.
+     */
+    updatePoseOverlayViewBox(): void;
     updatePreviewStyle(): void;
     startLoopIfNeeded(): void;
     private trackPreparedModelOperation;
@@ -263,7 +287,11 @@ export declare class TMExtension {
      */
     captureSquareFrame(): {
         tensor: any;
-        size: number;
+        crop: {
+            left: number;
+            top: number;
+            size: number;
+        };
     } | null;
     recognizeFrame(model: any, recognitionMode: RecognitionMode): Promise<{
         keypoints: any;

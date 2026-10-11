@@ -69,7 +69,7 @@ That download, and the artifact a composite runtime fetches, is the version-pinn
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.4.1/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.0/dist/tm.js
 ```
 
 The standalone extension loads one reviewed browser runtime that contains one TensorFlow.js 4.22.0
@@ -81,13 +81,13 @@ Composite runtimes can load or embed the same artifact without rewriting a minif
 bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.4.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.0/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.4.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.0
 ```
 
 ### Offline PoseNet bundle API
@@ -457,6 +457,13 @@ be reading. The frames recognition sees are unchanged either way.
 Camera Source is not required. It is a separate extension, and this one is also loaded directly by
 URL, so when it is absent the extension opens and stops its own camera exactly as before. Nothing
 in a project needs to change for either configuration.
+
+3.5.0 changes what the stage shows and what the model is fed. The preview is the camera's own
+video rather than a 320×240 readback canvas scaled to fit, so it carries the camera's resolution
+and aspect ratio. The model is fed the whole square centre crop as a tensor; the canvas used to
+hold only its top 240 rows, so a quarter of the subject's height never reached it. Blocks,
+opcodes and the composition API are unchanged, and a project needs no edit — but a pose model
+will see a subject it was not seeing before, which is the point.
 
 Leasing is fixed in 3.4.1. In 3.4.0 a leased start threw `Webcam canvas does not provide a 2D
 context` and recognition never began, because the upstream camera helper builds its readback canvas

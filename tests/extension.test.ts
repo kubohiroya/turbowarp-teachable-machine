@@ -1430,3 +1430,112 @@ describe('TMExtension compute backend', () => {
     ]);
   });
 });
+
+describe('pose inference input', () => {
+  function tensorflowDouble() {
+    const disposed: string[] = [];
+    const tensor = (id: string, shape: number[]) => ({
+      id,
+      shape,
+      dispose: () => disposed.push(id)
+    });
+    const calls: Array<[string, ...unknown[]]> = [];
+    const tensorflow = {
+      browser: {
+        fromPixels: vi.fn((source: unknown) => {
+          calls.push(['fromPixels', source]);
+          return tensor('frame', [480, 640, 3]);
+        })
+      },
+      tidy: vi.fn((work: () => unknown) => work()),
+      slice: vi.fn((input: unknown, begin: number[], size: number[]) => {
+        calls.push(['slice', begin, size]);
+        return tensor('cropped', [size[0] as number, size[1] as number, 3]);
+      }),
+      reverse: vi.fn((input: unknown, axis: number[]) => {
+        calls.push(['reverse', axis]);
+        return tensor('mirrored', (input as {shape: number[]}).shape);
+      })
+    };
+    return {calls, disposed, tensorflow};
+  }
+
+  it('takes the whole square off the camera and mirrors it on the way to the model', async () => {
+    const {calls, disposed, tensorflow} = tensorflowDouble();
+    vi.stubGlobal('tf', tensorflow);
+    const extension = new TMExtension();
+    extension.webcam = {
+      webcam: {videoWidth: 640, videoHeight: 480},
+      canvas: createElement('CANVAS')
+    };
+    const seen: unknown[] = [];
+    const model = {
+      estimatePose: vi.fn(async (sample: unknown) => {
+        seen.push(sample);
+        return {pose: {keypoints: [{part: 'nose', score: 1, position: {x: 240, y: 120}}]}, posenetOutput: new Float32Array(1)};
+      }),
+      predict: vi.fn(async () => [{className: 'guard', probability: 1}])
+    };
+
+    const recognition = await extension.recognizeFrame(model, 'pose');
+
+    // The crop is the full centre square of the frame -- 480 of 480 rows, not the 240 the readback
+    // canvas could hold -- and the pixels are mirrored, which is what the classifier was trained on.
+    expect(calls).toEqual([
+      ['fromPixels', extension.webcam.webcam],
+      ['slice', [0, 80, 0], [480, 480, 3]],
+      ['reverse', [1]]
+    ]);
+    expect(seen).toEqual([expect.objectContaining({id: 'mirrored'})]);
+    // `estimatePose` is never asked to flip: that flips keypoints, not pixels.
+    expect(model.estimatePose).toHaveBeenCalledWith(expect.objectContaining({id: 'mirrored'}));
+    // Keypoints come back in crop space and are carried to the preview's 320-wide space.
+    expect(recognition.keypoints).toEqual([
+      {part: 'nose', score: 1, position: {x: 160, y: 80}}
+    ]);
+    // Nothing from the frame outlives the call.
+    expect(disposed).toEqual(['frame', 'mirrored']);
+  });
+
+  it('falls back to the readback canvas when there is no frame to take', async () => {
+    vi.stubGlobal('tf', undefined);
+    const extension = new TMExtension();
+    const canvas = createElement('CANVAS');
+    extension.webcam = {webcam: {videoWidth: 0, videoHeight: 0}, canvas};
+    const model = {
+      estimatePose: vi.fn(async () => ({
+        pose: {keypoints: [{part: 'nose', score: 1, position: {x: 10, y: 20}}]},
+        posenetOutput: new Float32Array(1)
+      })),
+      predict: vi.fn(async () => [])
+    };
+
+    const recognition = await extension.recognizeFrame(model, 'pose');
+
+    expect(model.estimatePose).toHaveBeenCalledWith(canvas);
+    // Canvas space is preview space, so the keypoints pass through untouched.
+    expect(recognition.keypoints).toEqual([{part: 'nose', score: 1, position: {x: 10, y: 20}}]);
+  });
+
+  it('releases the frame even when the model throws', async () => {
+    const {disposed, tensorflow} = tensorflowDouble();
+    vi.stubGlobal('tf', tensorflow);
+    const extension = new TMExtension();
+    extension.webcam = {webcam: {videoWidth: 640, videoHeight: 480}, canvas: createElement('CANVAS')};
+    const failure = new Error('the model failed');
+
+    await expect(
+      extension.recognizeFrame(
+        {
+          estimatePose: async () => {
+            throw failure;
+          },
+          predict: async () => []
+        },
+        'pose'
+      )
+    ).rejects.toBe(failure);
+
+    expect(disposed).toEqual(['frame', 'mirrored']);
+  });
+});

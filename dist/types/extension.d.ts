@@ -10,6 +10,15 @@ export declare const CAMERA_FRAME_WIDTH = 320;
 export declare const CAMERA_FRAME_HEIGHT = 240;
 export declare const BLOCK_ICON_URI: string;
 export type RecognitionMode = 'pose' | 'image' | 'audio';
+/**
+ * Put keypoints where the preview shows them.
+ *
+ * The model now sees a square crop at the camera's own resolution, so its keypoints come back in
+ * that square's space. The overlay draws over the 320-wide readback canvas, which holds the same
+ * crop scaled to 320. One factor carries one space into the other; the keypoints below the
+ * canvas's 240 rows fall outside its viewBox, exactly as they did when the crop was drawn there.
+ */
+export declare function scaleKeypointsToPreview(keypoints: unknown, size: number): unknown;
 export interface TeachableMachineRuntime {
     Webcam: new (width: number, height: number, flipHorizontal: boolean) => any;
     load?(modelURL: string, metadataURL: string): Promise<any>;
@@ -237,6 +246,25 @@ export declare class TMExtension {
     private trackPreparedModelOperation;
     waitForPreparedModelIdle(model: object): Promise<void>;
     loop(generation?: any): Promise<void>;
+    /**
+     * The square the model looks at, as a tensor, taken straight off the camera.
+     *
+     * The readback canvas is 320x240 and holds a 320x320 centre crop drawn into it, so its bottom
+     * quarter -- 25% of the subject's height -- never reaches the model. Cropping the frame itself
+     * keeps the whole square. The crop and the mirroring both run as tensor ops, which is where the
+     * backend can keep them on the GPU; `fromPixels` uploads a video element directly to a texture
+     * on the WebGL and WebGPU backends, so no Canvas2D stage sits in the path.
+     *
+     * The pixels are mirrored here rather than through `estimatePose(sample, flipHorizontal)`:
+     * that flag flips the returned keypoints, not the image, and the classifier head was trained on
+     * mirrored frames. Flipping the pixels is what keeps the model's input the same as before.
+     *
+     * Returns null when there is no frame to take, and the canvas path answers instead.
+     */
+    captureSquareFrame(): {
+        tensor: any;
+        size: number;
+    } | null;
     recognizeFrame(model: any, recognitionMode: RecognitionMode): Promise<{
         keypoints: any;
         prediction: any;

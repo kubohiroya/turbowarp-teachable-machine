@@ -1218,8 +1218,11 @@ describe('TMExtension', () => {
     const video = createElement('VIDEO');
     const model = {
       estimatePose: vi.fn(),
-      predict: vi.fn(async (source: unknown) => {
+      predict: vi.fn(async (source: unknown, flipped: unknown) => {
         expect(source).toBe(video);
+        // The pixels come off the camera unmirrored, and the model was trained on mirrored
+        // frames, so image mode asks `predict` to mirror -- the same square the pose path feeds.
+        expect(flipped).toBe(true);
         return [
           {className: 'card', probability: 0.8},
           {className: 'empty', probability: 0.2}
@@ -1231,6 +1234,7 @@ describe('TMExtension', () => {
     const recognition = await extension.recognizeFrame(model, 'image');
 
     expect(model.estimatePose).not.toHaveBeenCalled();
+    expect(model.predict).toHaveBeenCalledWith(video, true);
     expect(recognition).toEqual({
       keypoints: [],
       prediction: [
@@ -1238,6 +1242,23 @@ describe('TMExtension', () => {
         {className: 'empty', probability: 0.2}
       ]
     });
+  });
+
+  it('leaves the already mirrored readback canvas unmirrored in image mode', async () => {
+    const extension = new TMExtension();
+    const canvas = createElement('CANVAS');
+    const model = {
+      estimatePose: vi.fn(),
+      predict: vi.fn(async () => [{className: 'card', probability: 1}])
+    };
+    // `Webcam` built this canvas with flip on, so mirroring it again would hand the model the
+    // frame the wrong way round.
+    extension.webcam = {canvas, webcam: null};
+
+    const recognition = await extension.recognizeFrame(model, 'image');
+
+    expect(model.predict).toHaveBeenCalledWith(canvas, false);
+    expect(recognition).toEqual({keypoints: [], prediction: [{className: 'card', probability: 1}]});
   });
 
   it('invalidates an old asynchronous loop generation on camera cleanup', () => {

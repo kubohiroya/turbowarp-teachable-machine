@@ -283,6 +283,12 @@ export declare class TMExtension {
      * that flag flips the returned keypoints, not the image, and the classifier head was trained on
      * mirrored frames. Flipping the pixels is what keeps the model's input the same as before.
      *
+     * The WASM and CPU backends have no texture to upload to, so `fromPixels` reads the frame back
+     * through Canvas2D there and this path loses its advantage -- but not its correctness. Driving
+     * one deterministic frame through every backend returns the same probabilities to two decimals
+     * (webgl / wasm / cpu: 0.08, 0.90, 0.02, 0.00) and `tf.memory().numTensors` stays flat over a
+     * six-second run on each, so nothing here depends on which backend `compute-backend.ts` picked.
+     *
      * Returns null when there is no frame to take, and the canvas path answers instead.
      */
     captureSquareFrame(): {

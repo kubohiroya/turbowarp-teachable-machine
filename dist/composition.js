@@ -666,6 +666,34 @@ var VERSION = `${package_default.version}-typescript`;
 var DOCS_URI = "https://kubohiroya.github.io/turbowarp-teachable-machine/";
 var ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANGED";
 var BLOCK_ICON_URI = `data:image/svg+xml,${encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><g fill=\"none\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 21V8h13M43 8h13v13M8 43v13h13M43 56h13V43M32 25v15M20 31l12 5 12-5M32 40 23 52M32 40l9 12\"/><circle cx=\"32\" cy=\"18\" r=\"5\"/></g></svg>")}`;
+/**
+* Put keypoints where the preview shows them.
+*
+* The model now sees a square crop at the camera's own resolution, so its keypoints come back in
+* that square's space. The overlay draws over the 320-wide readback canvas, which holds the same
+* crop scaled to 320. One factor carries one space into the other; the keypoints below the
+* canvas's 240 rows fall outside its viewBox, exactly as they did when the crop was drawn there.
+*/
+function scaleKeypointsToPreview(keypoints, size) {
+	if (!Array.isArray(keypoints) || !(size > 0)) return keypoints;
+	const scale = 320 / size;
+	if (scale === 1) return keypoints;
+	return keypoints.map((keypoint) => {
+		if (typeof keypoint !== "object" || keypoint === null) return keypoint;
+		const position = keypoint.position;
+		const x = Number(position?.x);
+		const y = Number(position?.y);
+		if (!Number.isFinite(x) || !Number.isFinite(y)) return keypoint;
+		return {
+			...keypoint,
+			position: {
+				...position,
+				x: x * scale,
+				y: y * scale
+			}
+		};
+	});
+}
 var BROWSER_RUNTIME_URL = `https://cdn.jsdelivr.net/npm/${package_default.name}@${package_default.version}/dist/runtime.js`;
 var POSITION_ITEMS = [
 	{
@@ -1908,15 +1936,70 @@ var TMExtension = class {
 		if (generation === this.loopGeneration && this.cameraRunning && this.webcam) requestAnimationFrame(() => void this.loop(generation));
 		else if (generation === this.loopGeneration) this.loopStarted = false;
 	}
+	/**
+	* The square the model looks at, as a tensor, taken straight off the camera.
+	*
+	* The readback canvas is 320x240 and holds a 320x320 centre crop drawn into it, so its bottom
+	* quarter -- 25% of the subject's height -- never reaches the model. Cropping the frame itself
+	* keeps the whole square. The crop and the mirroring both run as tensor ops, which is where the
+	* backend can keep them on the GPU; `fromPixels` uploads a video element directly to a texture
+	* on the WebGL and WebGPU backends, so no Canvas2D stage sits in the path.
+	*
+	* The pixels are mirrored here rather than through `estimatePose(sample, flipHorizontal)`:
+	* that flag flips the returned keypoints, not the image, and the classifier head was trained on
+	* mirrored frames. Flipping the pixels is what keeps the model's input the same as before.
+	*
+	* Returns null when there is no frame to take, and the canvas path answers instead.
+	*/
+	captureSquareFrame() {
+		const tensorflow = globalThis.tf;
+		const video = this.webcam?.webcam;
+		if (typeof tensorflow?.browser?.fromPixels !== "function" || typeof tensorflow.tidy !== "function" || !video || !(video.videoWidth > 0) || !(video.videoHeight > 0)) return null;
+		const size = Math.min(video.videoWidth, video.videoHeight);
+		const frame = tensorflow.browser.fromPixels(video);
+		try {
+			return {
+				tensor: tensorflow.tidy(() => {
+					const top = frame.shape[0] - size >> 1;
+					const left = frame.shape[1] - size >> 1;
+					return tensorflow.reverse(tensorflow.slice(frame, [
+						top,
+						left,
+						0
+					], [
+						size,
+						size,
+						3
+					]), [1]);
+				}),
+				size
+			};
+		} finally {
+			frame.dispose();
+		}
+	}
 	async recognizeFrame(model, recognitionMode) {
 		if (recognitionMode === "pose") {
 			if (typeof model.estimatePose !== "function") throw new Error("Teachable Machine: The active model does not support pose recognition.");
-			const estimate = await model.estimatePose(this.webcam.canvas);
-			const prediction = await model.predict(estimate.posenetOutput);
-			return {
-				keypoints: estimate.pose?.keypoints,
-				prediction
-			};
+			const square = this.captureSquareFrame();
+			if (!square) {
+				const estimate = await model.estimatePose(this.webcam.canvas);
+				const prediction = await model.predict(estimate.posenetOutput);
+				return {
+					keypoints: estimate.pose?.keypoints,
+					prediction
+				};
+			}
+			try {
+				const estimate = await model.estimatePose(square.tensor);
+				const prediction = await model.predict(estimate.posenetOutput);
+				return {
+					keypoints: scaleKeypointsToPreview(estimate.pose?.keypoints, square.size),
+					prediction
+				};
+			} finally {
+				square.tensor.dispose();
+			}
 		}
 		const source = this.webcam.webcam ?? this.webcam.canvas;
 		return {

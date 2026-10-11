@@ -662,7 +662,9 @@ describe('TMExtension', () => {
 
     const svg = extension.poseOverlaySvg;
     expect(stage.children).toEqual([canvas, svg]);
-    expect(svg.getAttribute('viewBox')).toBe('0 0 320 240');
+    // The overlay spans what the preview shows. With no video to show, that is the readback
+    // canvas, so the viewBox is its dimensions.
+    expect(svg.getAttribute('viewBox')).toBe('0 0 480 360');
     expect(svg.children[0].getAttribute('data-layer')).toBe('bones');
     expect(svg.children[1].getAttribute('data-layer')).toBe('joints');
     expect(extension.poseOverlayJointElements.size).toBe(17);
@@ -1489,9 +1491,10 @@ describe('pose inference input', () => {
     expect(seen).toEqual([expect.objectContaining({id: 'mirrored'})]);
     // `estimatePose` is never asked to flip: that flips keypoints, not pixels.
     expect(model.estimatePose).toHaveBeenCalledWith(expect.objectContaining({id: 'mirrored'}));
-    // Keypoints come back in crop space and are carried to the preview's 320-wide space.
+    // Keypoints come back measured from the mirrored square's left edge; undoing the mirror and
+    // adding the crop's offset puts them on the camera frame, which is what the preview shows.
     expect(recognition.keypoints).toEqual([
-      {part: 'nose', score: 1, position: {x: 160, y: 80}}
+      {part: 'nose', score: 1, position: {x: 320, y: 120}}
     ]);
     // Nothing from the frame outlives the call.
     expect(disposed).toEqual(['frame', 'mirrored']);
@@ -1537,5 +1540,86 @@ describe('pose inference input', () => {
     ).rejects.toBe(failure);
 
     expect(disposed).toEqual(['frame', 'mirrored']);
+  });
+});
+
+describe('camera preview', () => {
+  it('shows the camera at its own resolution and spans the overlay over it', () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    const video = createElement('VIDEO') as unknown as {
+      videoWidth: number;
+      videoHeight: number;
+      style: Record<string, string>;
+    };
+    video.videoWidth = 1920;
+    video.videoHeight = 1080;
+    const extension = new TMExtension({poseOverlay: true});
+    extension.webcam = {canvas, webcam: video} as never;
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+
+    extension.attachPreviewToStage();
+
+    // The stage shows the video, not the 320x240 readback canvas stretched to fit.
+    expect(extension.previewCanvas).toBe(video);
+    expect(stage.children[0]).toBe(video);
+    expect(extension.poseOverlaySvg.getAttribute('viewBox')).toBe('0 0 1920 1080');
+  });
+
+  it('mirrors the video for the mode that leaves the readback canvas alone', () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    const video = createElement('VIDEO') as unknown as {videoWidth: number; videoHeight: number; style: Record<string, string>};
+    video.videoWidth = 640;
+    video.videoHeight = 480;
+    const extension = new TMExtension({poseOverlay: true});
+    extension.webcam = {canvas, webcam: video} as never;
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+    extension.attachPreviewToStage();
+
+    // The canvas arrives mirrored because that is what the model is fed; the video does not. The
+    // same requested mirroring therefore means opposite transforms.
+    extension.setPreviewMirroring({MIRRORING: 'mirrored'});
+    expect(video.style.transform).toBe('scaleX(-1)');
+    extension.setPreviewMirroring({MIRRORING: 'unmirrored'});
+    expect(video.style.transform).toBe('');
+  });
+});
+
+describe('per-frame cost', () => {
+  it('stops drawing the readback canvas once the video is the preview', async () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    const video = createElement('VIDEO') as unknown as {videoWidth: number; videoHeight: number};
+    video.videoWidth = 640;
+    video.videoHeight = 480;
+    const update = vi.fn();
+    const extension = new TMExtension();
+    extension.webcam = {canvas, webcam: video, update} as never;
+    extension.cameraRunning = true;
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+    // One frame is the question; the loop asks for the next through requestAnimationFrame.
+    vi.stubGlobal('requestAnimationFrame', () => 0);
+
+    await extension.loop();
+
+    // Nothing reads that canvas now: the preview is the video and the model is fed tensors.
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('keeps drawing it while the canvas is still the preview', async () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    const update = vi.fn();
+    const extension = new TMExtension();
+    extension.webcam = {canvas, webcam: {videoWidth: 0, videoHeight: 0}, update} as never;
+    extension.cameraRunning = true;
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+    // One frame is the question; the loop asks for the next through requestAnimationFrame.
+    vi.stubGlobal('requestAnimationFrame', () => 0);
+
+    await extension.loop();
+
+    expect(update).toHaveBeenCalledOnce();
   });
 });

@@ -667,17 +667,16 @@ var DOCS_URI = "https://kubohiroya.github.io/turbowarp-teachable-machine/";
 var ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANGED";
 var BLOCK_ICON_URI = `data:image/svg+xml,${encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><g fill=\"none\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 21V8h13M43 8h13v13M8 43v13h13M43 56h13V43M32 25v15M20 31l12 5 12-5M32 40 23 52M32 40l9 12\"/><circle cx=\"32\" cy=\"18\" r=\"5\"/></g></svg>")}`;
 /**
-* Put keypoints where the preview shows them.
+* Put keypoints where the preview shows them: in the camera frame's own space.
 *
-* The model now sees a square crop at the camera's own resolution, so its keypoints come back in
-* that square's space. The overlay draws over the 320-wide readback canvas, which holds the same
-* crop scaled to 320. One factor carries one space into the other; the keypoints below the
-* canvas's 240 rows fall outside its viewBox, exactly as they did when the crop was drawn there.
+* The model sees a square centre crop with the pixels mirrored, so a keypoint comes back measured
+* from the mirrored square's left edge. Undoing the mirror and adding the crop's offset puts it
+* back on the frame, which is what the preview shows and what the overlay's viewBox spans. The
+* preview's own mirroring is a CSS transform over both the video and the overlay, so these
+* coordinates stay in frame space either way.
 */
-function scaleKeypointsToPreview(keypoints, size) {
-	if (!Array.isArray(keypoints) || !(size > 0)) return keypoints;
-	const scale = 320 / size;
-	if (scale === 1) return keypoints;
+function mapKeypointsToFrame(keypoints, crop) {
+	if (!Array.isArray(keypoints) || !(crop.size > 0)) return keypoints;
 	return keypoints.map((keypoint) => {
 		if (typeof keypoint !== "object" || keypoint === null) return keypoint;
 		const position = keypoint.position;
@@ -688,8 +687,8 @@ function scaleKeypointsToPreview(keypoints, size) {
 			...keypoint,
 			position: {
 				...position,
-				x: x * scale,
-				y: y * scale
+				x: crop.left + (crop.size - x),
+				y: crop.top + y
 			}
 		};
 	});
@@ -1671,7 +1670,7 @@ var TMExtension = class {
 		if (!this.featureFlags.poseOverlay) return null;
 		if (this.poseOverlaySvg) return this.poseOverlaySvg;
 		const svg = this.createSvgElement("svg");
-		svg.setAttribute("viewBox", "0 0 320 240");
+		svg.setAttribute("viewBox", `0 0 320 240`);
 		svg.setAttribute("width", "320");
 		svg.setAttribute("height", "240");
 		svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -1777,11 +1776,23 @@ var TMExtension = class {
 			line.style.display = "block";
 		}
 	}
+	/**
+	* The element the stage shows.
+	*
+	* The camera's own video, when there is one: it carries the camera's resolution and its aspect,
+	* so the preview stops being a 320x240 readback canvas stretched to fit. The canvas remains the
+	* preview only where there is no video to show, which is the same place inference falls back to
+	* it.
+	*/
+	previewSourceElement() {
+		const video = this.webcam?.webcam;
+		return video && video.videoWidth > 0 ? video : this.webcam?.canvas;
+	}
 	attachPreviewToStage() {
 		if (!this.webcam) throw new Error("TM: Start the camera before attaching the preview.");
 		if (!this.webcam.canvas) throw new Error("TM: webcam.canvas is unavailable.");
 		const stage = this.findStageElement();
-		const canvas = this.webcam.canvas;
+		const canvas = this.previewSourceElement();
 		let stageCanvas = null;
 		try {
 			const candidate = this.findLikelyStageCanvas();
@@ -1824,6 +1835,22 @@ var TMExtension = class {
 		this.updatePreviewStyle();
 		this.updatePoseOverlayVisibility();
 		this.validatePreviewAttachment(stage, canvas);
+	}
+	/**
+	* Span the overlay over what the preview is showing.
+	*
+	* Keypoints are in the camera frame's space, so the viewBox has to be the frame -- the video's
+	* own width and height, not the readback canvas's fixed 320x240. On the canvas fallback the two
+	* are the same thing.
+	*/
+	updatePoseOverlayViewBox() {
+		const svg = this.poseOverlaySvg;
+		const preview = this.previewCanvas;
+		if (!svg || !preview) return;
+		const width = preview.videoWidth ?? preview.width;
+		const height = preview.videoHeight ?? preview.height;
+		if (!(width > 0) || !(height > 0)) return;
+		svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 	}
 	updatePreviewStyle() {
 		const canvas = this.previewCanvas;
@@ -1882,9 +1909,10 @@ var TMExtension = class {
 				target.style.bottom = "8px";
 			}
 		}
-		const mirroringTransform = this.previewMirrored ? "" : "scaleX(-1)";
+		const mirroringTransform = this.previewCanvas === this.webcam?.webcam ? this.previewMirrored ? "scaleX(-1)" : "" : this.previewMirrored ? "" : "scaleX(-1)";
 		for (const target of targets) target.style.transform = [positionTransform, mirroringTransform].filter(Boolean).join(" ");
 		this.poseOverlaySvg?.setAttribute("preserveAspectRatio", this.previewPosition === "full-stage" ? "xMidYMid slice" : "xMidYMid meet");
+		this.updatePoseOverlayViewBox();
 	}
 	startLoopIfNeeded() {
 		if (this.loopStarted || !this.cameraRunning || !this.webcam) return;
@@ -1917,7 +1945,7 @@ var TMExtension = class {
 			return;
 		}
 		try {
-			this.webcam.update();
+			if (this.previewSourceElement() !== this.webcam.webcam) this.webcam.update();
 			if (this.recognizing && this.model) {
 				const model = this.model;
 				const recognitionMode = this.recognitionMode;
@@ -1958,21 +1986,23 @@ var TMExtension = class {
 		const size = Math.min(video.videoWidth, video.videoHeight);
 		const frame = tensorflow.browser.fromPixels(video);
 		try {
+			const top = frame.shape[0] - size >> 1;
+			const left = frame.shape[1] - size >> 1;
 			return {
-				tensor: tensorflow.tidy(() => {
-					const top = frame.shape[0] - size >> 1;
-					const left = frame.shape[1] - size >> 1;
-					return tensorflow.reverse(tensorflow.slice(frame, [
-						top,
-						left,
-						0
-					], [
-						size,
-						size,
-						3
-					]), [1]);
-				}),
-				size
+				tensor: tensorflow.tidy(() => tensorflow.reverse(tensorflow.slice(frame, [
+					top,
+					left,
+					0
+				], [
+					size,
+					size,
+					3
+				]), [1])),
+				crop: {
+					left,
+					top,
+					size
+				}
 			};
 		} finally {
 			frame.dispose();
@@ -1983,6 +2013,7 @@ var TMExtension = class {
 			if (typeof model.estimatePose !== "function") throw new Error("Teachable Machine: The active model does not support pose recognition.");
 			const square = this.captureSquareFrame();
 			if (!square) {
+				this.webcam.update?.();
 				const estimate = await model.estimatePose(this.webcam.canvas);
 				const prediction = await model.predict(estimate.posenetOutput);
 				return {
@@ -1994,7 +2025,7 @@ var TMExtension = class {
 				const estimate = await model.estimatePose(square.tensor);
 				const prediction = await model.predict(estimate.posenetOutput);
 				return {
-					keypoints: scaleKeypointsToPreview(estimate.pose?.keypoints, square.size),
+					keypoints: mapKeypointsToFrame(estimate.pose?.keypoints, square.crop),
 					prediction
 				};
 			} finally {

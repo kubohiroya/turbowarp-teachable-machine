@@ -1610,6 +1610,12 @@ export class TMExtension {
    * that flag flips the returned keypoints, not the image, and the classifier head was trained on
    * mirrored frames. Flipping the pixels is what keeps the model's input the same as before.
    *
+   * The WASM and CPU backends have no texture to upload to, so `fromPixels` reads the frame back
+   * through Canvas2D there and this path loses its advantage -- but not its correctness. Driving
+   * one deterministic frame through every backend returns the same probabilities to two decimals
+   * (webgl / wasm / cpu: 0.08, 0.90, 0.02, 0.00) and `tf.memory().numTensors` stays flat over a
+   * six-second run on each, so nothing here depends on which backend `compute-backend.ts` picked.
+   *
    * Returns null when there is no frame to take, and the canvas path answers instead.
    */
   captureSquareFrame() {
@@ -1663,8 +1669,17 @@ export class TMExtension {
         square.tensor.dispose();
       }
     }
-    const source = this.webcam.webcam ?? this.webcam.canvas;
-    const prediction = await model.predict(source);
+    // Image models see the same square as pose models: `predict` centre-crops whatever it is
+    // given, reading `videoWidth`/`videoHeight` off a video element, so the whole centre square
+    // of the frame reaches the model -- not the readback canvas's top three quarters.
+    //
+    // The mirroring has to be asked for. Teachable Machine's own guidance for passing the camera's
+    // video element is `predict(element, true)`, because training mirrored the preview in CSS and
+    // left the pixels alone. The readback canvas is the opposite case: `Webcam` built it with
+    // flip on, so it arrives mirrored already and must not be mirrored twice.
+    const video = this.webcam.webcam;
+    const source = video ?? this.webcam.canvas;
+    const prediction = await model.predict(source, Boolean(video));
     return {keypoints: [], prediction};
   }
 

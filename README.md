@@ -69,7 +69,7 @@ That download, and the artifact a composite runtime fetches, is the version-pinn
 jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.1/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.2/dist/tm.js
 ```
 
 The standalone extension loads one reviewed browser runtime that contains one TensorFlow.js 4.22.0
@@ -81,13 +81,13 @@ Composite runtimes can load or embed the same artifact without rewriting a minif
 bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.2/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.2
 ```
 
 ### Offline PoseNet bundle API
@@ -1071,3 +1071,8 @@ original binary files.
 ## License
 
 MPL-2.0
+
+
+## 固定入力の編集
+
+既定OFFの固定入力フォームと既存データの保持規則は[固定入力エディターの契約](docs/fixed-input-editors.ja.md)を参照してください。

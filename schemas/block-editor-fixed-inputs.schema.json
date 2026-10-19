@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kubohiroya.github.io/turbowarp-teachable-machine/schemas/block-editor-fixed-inputs.schema.json",
+  "title": "turbowarp-teachable-machine fixed input registration schema",
+  "$defs": {
+    "setRecognitionMode": {
+      "type": "object",
+      "properties": {
+        "MODE": {
+          "type": "string",
+          "enum": [
+            "pose",
+            "image",
+            "audio"
+          ]
+        }
+      }
+    },
+    "setComputeMode": {
+      "type": "object",
+      "properties": {
+        "MODE": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "webgpu",
+            "webgl",
+            "wasm",
+            "cpu"
+          ]
+        }
+      }
+    },
+    "setPreviewOpacity": {
+      "type": "object",
+      "properties": {
+        "OPACITY": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    },
+    "setPreviewPosition": {
+      "type": "object",
+      "properties": {
+        "POSITION": {
+          "type": "string",
+          "enum": [
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+            "center",
+            "full-stage"
+          ]
+        }
+      }
+    },
+    "setPreviewMirroring": {
+      "type": "object",
+      "properties": {
+        "MIRRORING": {
+          "type": "string",
+          "enum": [
+            "mirrored",
+            "unmirrored"
+          ]
+        }
+      }
+    },
+    "setPoseOverlayVisibility": {
+      "type": "object",
+      "properties": {
+        "VISIBILITY": {
+          "type": "string",
+          "enum": [
+            "on",
+            "off"
+          ]
+        }
+      }
+    },
+    "setPoseJointStyle": {
+      "type": "object",
+      "properties": {
+        "PART": {
+          "type": "string",
+          "enum": [
+            "nose",
+            "leftEye",
+            "rightEye",
+            "leftEar",
+            "rightEar",
+            "leftShoulder",
+            "rightShoulder",
+            "leftElbow",
+            "rightElbow",
+            "leftWrist",
+            "rightWrist",
+            "leftHip",
+            "rightHip",
+            "leftKnee",
+            "rightKnee",
+            "leftAnkle",
+            "rightAnkle"
+          ]
+        },
+        "OPACITY": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        },
+        "RADIUS": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    },
+    "setPoseBoneStyle": {
+      "type": "object",
+      "properties": {
+        "OPACITY": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        },
+        "WIDTH": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    },
+    "setPoseOverlayMinimumConfidence": {
+      "type": "object",
+      "properties": {
+        "CONFIDENCE": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    },
+    "setPoseConfidenceScaling": {
+      "type": "object",
+      "properties": {
+        "PROPERTY": {
+          "type": "string",
+          "enum": [
+            "joint-opacity",
+            "joint-radius",
+            "bone-opacity",
+            "bone-width"
+          ]
+        },
+        "STATE": {
+          "type": "string",
+          "enum": [
+            "on",
+            "off"
+          ]
+        }
+      }
+    },
+    "setAccumulatedPoseParameters": {
+      "type": "object",
+      "properties": {
+        "ACCUMULATION": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        },
+        "DECAY": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    },
+    "setAccumulatedPoseThreshold": {
+      "type": "object",
+      "properties": {
+        "THRESHOLD": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    },
+    "isPoseWithThreshold": {
+      "type": "object",
+      "properties": {
+        "THRESHOLD": {
+          "type": "number",
+          "$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+        }
+      }
+    }
+  }
+}

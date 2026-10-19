@@ -1,3 +1,4 @@
+import {fixedInputRegistration} from './fixed-input-editors.js';
 import definitions from './block-definitions.json' with {type: 'json'};
 import {
   COMPUTE_MODES,
@@ -462,7 +463,11 @@ export class TMExtension {
     }
   }
 
+  private readonly fixedEditors = fixedInputRegistration(typeof Scratch === 'undefined' ? undefined : Scratch);
+
   getInfo() {
+    const visibleOpcodes = definitions.blocks.filter((block: any) => !block.featureFlag || this.featureFlags[block.featureFlag]).map((block: any) => `${EXTENSION_ID}_${block.opcode}`);
+    this.fixedEditors.ensure(visibleOpcodes);
     return {
       id: EXTENSION_ID,
       name: Scratch.translate(definitions.extensionName),
@@ -1738,6 +1743,7 @@ export class TMExtension {
   }
 
   dispose() {
+    this.fixedEditors.dispose();
     this.stopCamera();
     if (this.featureFlags.temporalPoseScoring && typeof document !== 'undefined') {
       document.removeEventListener('visibilitychange', this.visibilityChangeListener);

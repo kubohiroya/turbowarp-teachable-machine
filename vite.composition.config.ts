@@ -1,6 +1,8 @@
+import {normalizeBundleIndentation} from './vite-indent-plugin.js';
 import {defineConfig} from 'vite';
 
 export default defineConfig({
+  plugins: [normalizeBundleIndentation()],
   build: {
     emptyOutDir: false,
     lib: {

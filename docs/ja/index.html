@@ -15,10 +15,10 @@
   <a class="skip-link" href="#main">本文へ移動</a>
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="./" aria-label="Teachable Machine 3.5.1日本語ガイドの先頭">
+      <a class="brand" href="./" aria-label="Teachable Machine 3.5.2日本語ガイドの先頭">
         <span class="brand-mark">TM</span>
         <span class="brand-label">Teachable Machine</span>
-        <span class="version-badge" aria-hidden="true">v3.5.1</span>
+        <span class="version-badge" aria-hidden="true">v3.5.2</span>
       </a>
       <nav class="primary-nav" aria-label="ガイドの章">
         <a href="#quick-start">クイックスタート</a>
@@ -400,5 +400,6 @@
       <p><a href="https://github.com/kubohiroya/turbowarp-teachable-machine/issues">問題を報告</a> · <a href="../" lang="en" hreflang="en">English version</a></p>
     </div>
   </footer>
+<section id="fixed-input-editors"><h2>固定入力の編集</h2><p>recognition/compute/preview/poseの固定選択と数値だけを対象とし、モデルload、カメラ、デバイス列挙、GPU利用可否の探索は行わない。POSITIONの日本語alias、recognition/mirroring/compute/on-offの既知aliasは表示投影のみ。PoseNet PARTはcamelCaseを維持しMotion Captureのsnake_caseと統合しない。finiteな新数値には既存runtimeのclamp/floorをそのまま残し、保存rawをclampしない。poseOverlay/temporalPoseScoringで実getInfoから消えたopcodeの登録を除去し、現れるopcodeだけ再登録する。元のownerフラグ既定値は変更しない。</p><ul></ul><p><a href="../fixed-input-editors.ja.md">固定入力の契約・保持規則・切戻し</a></p></section>
 </body>
 </html>

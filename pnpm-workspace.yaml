@@ -1,14 +1,15 @@
 allowBuilds:
-  "@kubohiroya/turbowarp-extension-data-editor@https://codeload.github.com/kubohiroya/turbowarp-extension-data-editor/tar.gz/485f0e550e622235624b5e9176820161aeeba252": true
   core-js: false
   esbuild: false
 
 minimumReleaseAgeExclude:
-  - '@kubohiroya/vite-plugin-turbowarp-extension@0.4.0'
 
 # The Teachable Machine and TensorFlow.js model packages still pin their peer
 # ranges to the TensorFlow.js 1.x/3.x era. TurboWarp Teachable Machine ships one TensorFlow.js
 # 4.22.0 module graph, so every package in the tree resolves to that one copy.
+  - '@kubohiroya/turbowarp-camera-source@0.17.1'
+  - '@kubohiroya/turbowarp-extension-data-editor@0.2.1'
+  - '@kubohiroya/vite-plugin-turbowarp-extension@0.6.1'
 overrides:
   '@tensorflow/tfjs': 4.22.0
   '@tensorflow/tfjs-core': 4.22.0

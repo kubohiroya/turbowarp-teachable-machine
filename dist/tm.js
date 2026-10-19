@@ -7,7 +7,7 @@
 (function (Scratch) {
   'use strict';
 
-  //#region node_modules/.pnpm/@kubohiroya+turbowarp-extension-data-editor@https+++codeload.github.com+kubohiroya+turb_5174995e0659a2991b0bf213cfddbf18/node_modules/@kubohiroya/turbowarp-extension-data-editor/dist/fixed-input-schema.js
+  //#region node_modules/.pnpm/@kubohiroya+turbowarp-extension-data-editor@0.2.1_react@18.3.1/node_modules/@kubohiroya/turbowarp-extension-data-editor/dist/fixed-input-schema.js
   var numberToken = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?$/u;
   var invalidNumber = Object.freeze({
     kind: "invalid",
@@ -1228,7 +1228,7 @@
   }
   var package_default = {
     name: "@kubohiroya/turbowarp-teachable-machine",
-    version: "3.5.1",
+    version: "3.5.2",
     description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
     author: "Hiroya Kubo <hiroya@cuc.ac.jp>",
     license: "MPL-2.0",
@@ -1298,8 +1298,8 @@
       "prepack": "npm run build && npm run release:consistency:check"
     },
     devDependencies: {
-      "@kubohiroya/turbowarp-camera-source": "0.13.0",
-      "@kubohiroya/vite-plugin-turbowarp-extension": "0.4.0",
+      "@kubohiroya/turbowarp-camera-source": "0.17.1",
+      "@kubohiroya/vite-plugin-turbowarp-extension": "0.6.1",
       "@teachablemachine/image": "0.8.5",
       "@teachablemachine/pose": "0.8.6",
       "@tensorflow-models/posenet": "2.2.2",
@@ -1311,7 +1311,7 @@
       "typescript": "^5.9.3",
       "vite": "^8.2.2",
       "vitest": "^4.0.14",
-      "@kubohiroya/turbowarp-extension-data-editor": "git+https://github.com/kubohiroya/turbowarp-extension-data-editor.git#485f0e550e622235624b5e9176820161aeeba252"
+      "@kubohiroya/turbowarp-extension-data-editor": "0.2.1"
     },
     keywords: [
       "turbowarp",
@@ -1322,7 +1322,13 @@
       "audio",
       "camera",
       "teachable-machine"
-    ]
+    ],
+    gitHead: "97ef12018789316d6170a7aab29d7c5b0a4c90f4",
+    "x-turbowarp-source": {
+      "revision": "97ef12018789316d6170a7aab29d7c5b0a4c90f4",
+      "revisionRole": "base-commit",
+      "sourceState": "local-release-overlay"
+    }
   };
   //#endregion
   //#region src/extension.ts

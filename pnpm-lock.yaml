@@ -18,14 +18,14 @@ importers:
   .:
     devDependencies:
       '@kubohiroya/turbowarp-camera-source':
-        specifier: 0.13.0
-        version: 0.13.0
+        specifier: 0.17.1
+        version: 0.17.1(react@18.3.1)
       '@kubohiroya/turbowarp-extension-data-editor':
-        specifier: git+https://github.com/kubohiroya/turbowarp-extension-data-editor.git#485f0e550e622235624b5e9176820161aeeba252
-        version: https://codeload.github.com/kubohiroya/turbowarp-extension-data-editor/tar.gz/485f0e550e622235624b5e9176820161aeeba252(react@18.3.1)
+        specifier: 0.2.1
+        version: 0.2.1(react@18.3.1)
       '@kubohiroya/vite-plugin-turbowarp-extension':
-        specifier: 0.4.0
-        version: 0.4.0(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.1)(yaml@2.9.1))
+        specifier: 0.6.1
+        version: 0.6.1(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.1)(yaml@2.9.1))
       '@teachablemachine/image':
         specifier: 0.8.5
         version: 0.8.5(@tensorflow/tfjs@4.22.0(seedrandom@3.0.5))
@@ -221,13 +221,12 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kubohiroya/turbowarp-camera-source@0.13.0':
-    resolution: {integrity: sha512-CjoL/l4QcCueAdTtZs0cwyZbd+WZvymcQeF7PSUXn3H85XcVWWD5ZOHhO2vjv9WYduqOjLzkjMJa/GhqRisq8g==}
+  '@kubohiroya/turbowarp-camera-source@0.17.1':
+    resolution: {integrity: sha512-91Z/MPB/TD+v79tkObYlQipGhKSqvqsARXIpkgCdZZ8+AqQjPd5dW8LlSZxDiJTYSuF5h098F/oCJEMNdvCcDA==}
     engines: {node: '>=22.18.0'}
 
-  '@kubohiroya/turbowarp-extension-data-editor@https://codeload.github.com/kubohiroya/turbowarp-extension-data-editor/tar.gz/485f0e550e622235624b5e9176820161aeeba252':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/kubohiroya/turbowarp-extension-data-editor/tar.gz/485f0e550e622235624b5e9176820161aeeba252}
-    version: 0.2.0
+  '@kubohiroya/turbowarp-extension-data-editor@0.2.1':
+    resolution: {integrity: sha512-XFI4n7FLVDsdqRidfHpw1Ka2OjPKlK7JrM6S+22KSK8ECIxLLUsa6xkwmlkrAQZw5s8et75eghO4rEkrHisMHw==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^16.14.0 || ^17 || ^18
@@ -238,8 +237,8 @@ packages:
       react-dom:
         optional: true
 
-  '@kubohiroya/vite-plugin-turbowarp-extension@0.4.0':
-    resolution: {integrity: sha512-8Uh4TA4pNhFkx/HFIT6gBZTgQY3Lv3LTDYRQN6oWtHHzoiK+Chn9LBtKeagBXDlQsCZC+8WcOGhCGSWHOhxXbw==}
+  '@kubohiroya/vite-plugin-turbowarp-extension@0.6.1':
+    resolution: {integrity: sha512-p8fvSP3wPNOIzuXvyKayYdx9xvAlwn76unKkIdiSJ2FBsMBkvb5xWfdNXj7ayw54d4qu1KODqsPV4Myn4bPXew==}
     engines: {node: '>=22.18.0'}
     peerDependencies:
       vite: '>=8.0.0'
@@ -1160,9 +1159,14 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kubohiroya/turbowarp-camera-source@0.13.0': {}
+  '@kubohiroya/turbowarp-camera-source@0.17.1(react@18.3.1)':
+    dependencies:
+      '@kubohiroya/turbowarp-extension-data-editor': 0.2.1(react@18.3.1)
+    transitivePeerDependencies:
+      - react
+      - react-dom
 
-  '@kubohiroya/turbowarp-extension-data-editor@https://codeload.github.com/kubohiroya/turbowarp-extension-data-editor/tar.gz/485f0e550e622235624b5e9176820161aeeba252(react@18.3.1)':
+  '@kubohiroya/turbowarp-extension-data-editor@0.2.1(react@18.3.1)':
     dependencies:
       '@rjsf/core': 5.24.13(@rjsf/utils@5.24.13(react@18.3.1))(react@18.3.1)
       '@rjsf/utils': 5.24.13(react@18.3.1)
@@ -1174,7 +1178,7 @@ snapshots:
     optionalDependencies:
       react: 18.3.1
 
-  '@kubohiroya/vite-plugin-turbowarp-extension@0.4.0(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.1)(yaml@2.9.1))':
+  '@kubohiroya/vite-plugin-turbowarp-extension@0.6.1(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.1)(yaml@2.9.1))':
     dependencies:
       acorn: 8.18.0
       vite: 8.2.2(@types/node@22.20.1)(esbuild@0.28.1)(yaml@2.9.1)

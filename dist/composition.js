@@ -47,6 +47,644 @@ function requireComputeMode(value) {
 	if (!mode) throw new TypeError(`TM: Unknown compute mode: ${String(value)}`);
 	return mode;
 }
+//#endregion
+//#region node_modules/.pnpm/@kubohiroya+turbowarp-extension-data-editor@https+++codeload.github.com+kubohiroya+turb_5174995e0659a2991b0bf213cfddbf18/node_modules/@kubohiroya/turbowarp-extension-data-editor/dist/fixed-input-schema.js
+var numberToken = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?$/u;
+var invalidNumber = Object.freeze({
+	kind: "invalid",
+	code: "fixed-number-input-invalid"
+});
+/**
+* Parse a NEW numeric draft according to NP-finite-new-input-v1.
+* Never apply this to opening/no-op raw values or use it as an owner validator.
+* Keep the validated token so negative zero, precision and exponent spelling survive.
+*/
+function parseFixedNumberInput(input) {
+	if (typeof input === "number") {
+		if (!Number.isFinite(input)) return invalidNumber;
+		return Object.freeze({
+			kind: "valid",
+			token: Object.is(input, -0) ? "-0" : String(input),
+			value: input
+		});
+	}
+	if (typeof input !== "string") return invalidNumber;
+	const token = input.trim();
+	if (!numberToken.test(token)) return invalidNumber;
+	const value = Number(token);
+	return Number.isFinite(value) ? Object.freeze({
+		kind: "valid",
+		token,
+		value
+	}) : invalidNumber;
+}
+var block_editor_fixed_inputs_schema_default = {
+	$schema: "https://json-schema.org/draft/2020-12/schema",
+	$id: "https://kubohiroya.github.io/turbowarp-teachable-machine/schemas/block-editor-fixed-inputs.schema.json",
+	title: "turbowarp-teachable-machine fixed input registration schema",
+	$defs: {
+		"setRecognitionMode": {
+			"type": "object",
+			"properties": { "MODE": {
+				"type": "string",
+				"enum": [
+					"pose",
+					"image",
+					"audio"
+				]
+			} }
+		},
+		"setComputeMode": {
+			"type": "object",
+			"properties": { "MODE": {
+				"type": "string",
+				"enum": [
+					"auto",
+					"webgpu",
+					"webgl",
+					"wasm",
+					"cpu"
+				]
+			} }
+		},
+		"setPreviewOpacity": {
+			"type": "object",
+			"properties": { "OPACITY": {
+				"type": "number",
+				"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+			} }
+		},
+		"setPreviewPosition": {
+			"type": "object",
+			"properties": { "POSITION": {
+				"type": "string",
+				"enum": [
+					"top-left",
+					"top-right",
+					"bottom-left",
+					"bottom-right",
+					"center",
+					"full-stage"
+				]
+			} }
+		},
+		"setPreviewMirroring": {
+			"type": "object",
+			"properties": { "MIRRORING": {
+				"type": "string",
+				"enum": ["mirrored", "unmirrored"]
+			} }
+		},
+		"setPoseOverlayVisibility": {
+			"type": "object",
+			"properties": { "VISIBILITY": {
+				"type": "string",
+				"enum": ["on", "off"]
+			} }
+		},
+		"setPoseJointStyle": {
+			"type": "object",
+			"properties": {
+				"PART": {
+					"type": "string",
+					"enum": [
+						"nose",
+						"leftEye",
+						"rightEye",
+						"leftEar",
+						"rightEar",
+						"leftShoulder",
+						"rightShoulder",
+						"leftElbow",
+						"rightElbow",
+						"leftWrist",
+						"rightWrist",
+						"leftHip",
+						"rightHip",
+						"leftKnee",
+						"rightKnee",
+						"leftAnkle",
+						"rightAnkle"
+					]
+				},
+				"OPACITY": {
+					"type": "number",
+					"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+				},
+				"RADIUS": {
+					"type": "number",
+					"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+				}
+			}
+		},
+		"setPoseBoneStyle": {
+			"type": "object",
+			"properties": {
+				"OPACITY": {
+					"type": "number",
+					"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+				},
+				"WIDTH": {
+					"type": "number",
+					"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+				}
+			}
+		},
+		"setPoseOverlayMinimumConfidence": {
+			"type": "object",
+			"properties": { "CONFIDENCE": {
+				"type": "number",
+				"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+			} }
+		},
+		"setPoseConfidenceScaling": {
+			"type": "object",
+			"properties": {
+				"PROPERTY": {
+					"type": "string",
+					"enum": [
+						"joint-opacity",
+						"joint-radius",
+						"bone-opacity",
+						"bone-width"
+					]
+				},
+				"STATE": {
+					"type": "string",
+					"enum": ["on", "off"]
+				}
+			}
+		},
+		"setAccumulatedPoseParameters": {
+			"type": "object",
+			"properties": {
+				"ACCUMULATION": {
+					"type": "number",
+					"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+				},
+				"DECAY": {
+					"type": "number",
+					"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+				}
+			}
+		},
+		"setAccumulatedPoseThreshold": {
+			"type": "object",
+			"properties": { "THRESHOLD": {
+				"type": "number",
+				"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+			} }
+		},
+		"isPoseWithThreshold": {
+			"type": "object",
+			"properties": { "THRESHOLD": {
+				"type": "number",
+				"$comment": "New finite numeric input uses NP-finite-new-input-v1. Existing raw is preserved on no-op; runtime clamp/floor is not applied to stored raw."
+			} }
+		}
+	}
+};
+//#endregion
+//#region src/fixed-input-schema.ts
+/** Owner canonical fragments, distinct from older SOURCE/editor schemas. */
+function fixedInputBundle(opcode, argument) {
+	const source = {
+		repository: "turbowarp-teachable-machine",
+		path: "schemas/block-editor-fixed-inputs.schema.json",
+		symbol: `#/$defs/${opcode}/properties/${argument}`
+	};
+	const fragment = block_editor_fixed_inputs_schema_default.$defs[opcode].properties[argument];
+	return {
+		identity: {
+			ownerId: "turbowarp-teachable-machine",
+			contractId: "fixed-inputs",
+			revision: "1",
+			variantId: `${opcode}.${argument}`
+		},
+		dialect: "2020-12",
+		root: {
+			retrievalUri: block_editor_fixed_inputs_schema_default.$id,
+			document: fragment,
+			artifact: {
+				role: "canonical-schema",
+				source
+			}
+		},
+		resources: [],
+		provenance: {
+			canonicalSources: [source, {
+				repository: "turbowarp-teachable-machine",
+				path: "src/extension.ts",
+				symbol: opcode
+			}],
+			generatedFiles: [],
+			referenceSchemas: [],
+			generationSources: []
+		}
+	};
+}
+block_editor_fixed_inputs_schema_default.$defs;
+//#endregion
+//#region src/fixed-input-editors.ts
+var existingNumber = (value) => {
+	if (typeof value !== "number" && typeof value !== "string" || typeof value === "string" && value.trim() === "") throw new TypeError("Expected a numeric literal.");
+	const number = Number(value);
+	if (!Number.isFinite(number)) throw new TypeError("Expected a finite number.");
+	return number;
+};
+var newNumber = (value) => {
+	const parsed = parseFixedNumberInput(value);
+	if (parsed.kind !== "valid") throw new TypeError("Invalid new numeric input.");
+	return parsed.token;
+};
+var aliases = {
+	"setRecognitionMode.MODE": {
+		"pose": "pose",
+		"poses": "pose",
+		"body": "pose",
+		"image": "image",
+		"images": "image",
+		"object": "image",
+		"card": "image",
+		"marker": "image",
+		"audio": "audio",
+		"sound": "audio",
+		"voice": "audio",
+		"microphone": "audio",
+		"mic": "audio",
+		"ポーズ": "pose",
+		"姿勢": "pose",
+		"画像": "image",
+		"物体": "image",
+		"カード": "image",
+		"記号": "image",
+		"音声": "audio",
+		"音": "audio",
+		"声": "audio",
+		"マイク": "audio"
+	},
+	"setPreviewPosition.POSITION": {
+		"左上": "top-left",
+		"右上": "top-right",
+		"左下": "bottom-left",
+		"右下": "bottom-right",
+		"中央": "center",
+		"ステージ全体": "full-stage",
+		"top-left": "top-left",
+		"top-right": "top-right",
+		"bottom-left": "bottom-left",
+		"bottom-right": "bottom-right",
+		"center": "center",
+		"full-stage": "full-stage"
+	},
+	"setPreviewMirroring.MIRRORING": {
+		"mirrored": "mirrored",
+		"unmirrored": "unmirrored",
+		"mirror": "mirrored",
+		"normal": "unmirrored",
+		"左右反転": "mirrored",
+		"そのまま": "unmirrored"
+	},
+	"setPoseOverlayVisibility.VISIBILITY": {
+		"on": "on",
+		"off": "off",
+		"show": "on",
+		"hide": "off",
+		"true": "on",
+		"false": "off",
+		"表示": "on",
+		"非表示": "off"
+	},
+	"setPoseConfidenceScaling.STATE": {
+		"on": "on",
+		"off": "off",
+		"show": "on",
+		"hide": "off",
+		"true": "on",
+		"false": "off",
+		"表示": "on",
+		"非表示": "off"
+	},
+	"setComputeMode.MODE": {
+		"auto": "auto",
+		"automatic": "auto",
+		"default": "auto",
+		"fastest": "auto",
+		"自動": "auto",
+		"おまかせ": "auto",
+		"webgpu": "webgpu",
+		"gpu": "webgpu",
+		"webgl": "webgl",
+		"wasm": "wasm",
+		"webassembly": "wasm",
+		"simd": "wasm",
+		"cpu": "cpu",
+		"javascript": "cpu"
+	}
+};
+function binding(opcode, argument, values) {
+	return {
+		argument,
+		schemaBundle: fixedInputBundle(opcode, argument),
+		control: values ? {
+			kind: "enum",
+			choices: values.map((value) => ({ value }))
+		} : { kind: "number" },
+		read(value) {
+			if (!values) return existingNumber(value);
+			if (typeof value !== "string") throw new TypeError("Expected a string.");
+			return projectEnum(opcode, argument, value);
+		},
+		encode(value) {
+			if (!values) return newNumber(value);
+			if (typeof value !== "string" || !values.includes(value)) throw new TypeError("Invalid selection.");
+			return value;
+		},
+		validateCandidate(value) {
+			try {
+				if (!values) existingNumber(value);
+				else if (typeof value !== "string" || !values.includes(value)) throw new TypeError("Invalid selection.");
+				return [];
+			} catch {
+				return [{ message: "Invalid fixed input." }];
+			}
+		}
+	};
+}
+function projectEnum(opcode, argument, value) {
+	const key = `${opcode}.${argument}`;
+	const token = argument === "POSITION" ? value : value.trim().toLowerCase();
+	return aliases[key]?.[token] ?? value;
+}
+var fixedInputEditors = [
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setRecognitionMode",
+		opcodes: ["kubohiroyatm_setRecognitionMode"],
+		contractId: "turbowarp-teachable-machine/setRecognitionMode",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setRecognitionMode", "MODE", [
+			"pose",
+			"image",
+			"audio"
+		])]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setComputeMode",
+		opcodes: ["kubohiroyatm_setComputeMode"],
+		contractId: "turbowarp-teachable-machine/setComputeMode",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setComputeMode", "MODE", [
+			"auto",
+			"webgpu",
+			"webgl",
+			"wasm",
+			"cpu"
+		])]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPreviewOpacity",
+		opcodes: ["kubohiroyatm_setPreviewOpacity"],
+		contractId: "turbowarp-teachable-machine/setPreviewOpacity",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPreviewOpacity", "OPACITY")]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPreviewPosition",
+		opcodes: ["kubohiroyatm_setPreviewPosition"],
+		contractId: "turbowarp-teachable-machine/setPreviewPosition",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPreviewPosition", "POSITION", [
+			"top-left",
+			"top-right",
+			"bottom-left",
+			"bottom-right",
+			"center",
+			"full-stage"
+		])]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPreviewMirroring",
+		opcodes: ["kubohiroyatm_setPreviewMirroring"],
+		contractId: "turbowarp-teachable-machine/setPreviewMirroring",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPreviewMirroring", "MIRRORING", ["mirrored", "unmirrored"])]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPoseOverlayVisibility",
+		opcodes: ["kubohiroyatm_setPoseOverlayVisibility"],
+		contractId: "turbowarp-teachable-machine/setPoseOverlayVisibility",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPoseOverlayVisibility", "VISIBILITY", ["on", "off"])]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPoseJointStyle",
+		opcodes: ["kubohiroyatm_setPoseJointStyle"],
+		contractId: "turbowarp-teachable-machine/setPoseJointStyle",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [
+			binding("setPoseJointStyle", "PART", [
+				"nose",
+				"leftEye",
+				"rightEye",
+				"leftEar",
+				"rightEar",
+				"leftShoulder",
+				"rightShoulder",
+				"leftElbow",
+				"rightElbow",
+				"leftWrist",
+				"rightWrist",
+				"leftHip",
+				"rightHip",
+				"leftKnee",
+				"rightKnee",
+				"leftAnkle",
+				"rightAnkle"
+			]),
+			binding("setPoseJointStyle", "OPACITY"),
+			binding("setPoseJointStyle", "RADIUS")
+		]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPoseBoneStyle",
+		opcodes: ["kubohiroyatm_setPoseBoneStyle"],
+		contractId: "turbowarp-teachable-machine/setPoseBoneStyle",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPoseBoneStyle", "OPACITY"), binding("setPoseBoneStyle", "WIDTH")]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPoseOverlayMinimumConfidence",
+		opcodes: ["kubohiroyatm_setPoseOverlayMinimumConfidence"],
+		contractId: "turbowarp-teachable-machine/setPoseOverlayMinimumConfidence",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPoseOverlayMinimumConfidence", "CONFIDENCE")]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setPoseConfidenceScaling",
+		opcodes: ["kubohiroyatm_setPoseConfidenceScaling"],
+		contractId: "turbowarp-teachable-machine/setPoseConfidenceScaling",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setPoseConfidenceScaling", "PROPERTY", [
+			"joint-opacity",
+			"joint-radius",
+			"bone-opacity",
+			"bone-width"
+		]), binding("setPoseConfidenceScaling", "STATE", ["on", "off"])]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setAccumulatedPoseParameters",
+		opcodes: ["kubohiroyatm_setAccumulatedPoseParameters"],
+		contractId: "turbowarp-teachable-machine/setAccumulatedPoseParameters",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setAccumulatedPoseParameters", "ACCUMULATION"), binding("setAccumulatedPoseParameters", "DECAY")]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-setAccumulatedPoseThreshold",
+		opcodes: ["kubohiroyatm_setAccumulatedPoseThreshold"],
+		contractId: "turbowarp-teachable-machine/setAccumulatedPoseThreshold",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("setAccumulatedPoseThreshold", "THRESHOLD")]
+	},
+	{
+		apiVersion: 1,
+		extensionId: "kubohiroyatm",
+		editorId: "fixed-isPoseWithThreshold",
+		opcodes: ["kubohiroyatm_isPoseWithThreshold"],
+		contractId: "turbowarp-teachable-machine/isPoseWithThreshold",
+		contractRevision: "1",
+		validationContext: () => ({
+			consumerId: "turbowarp-teachable-machine",
+			nowMs: 0,
+			settings: null
+		}),
+		bindings: [binding("isPoseWithThreshold", "THRESHOLD")]
+	}
+];
+/** Register only currently declared opcodes; release obsolete feature-flag scopes. */
+function fixedInputRegistration(scratch) {
+	const host = typeof scratch === "object" && scratch !== null ? scratch : {};
+	let active;
+	let activeOpcodes = "";
+	const removers = [];
+	let disposed = false;
+	const dispose = () => {
+		host.vm?.runtime?.off?.("RUNTIME_DISPOSED", shutdown);
+		for (const remove of removers.splice(0).reverse()) remove();
+		active = void 0;
+		activeOpcodes = "";
+	};
+	const shutdown = () => {
+		disposed = true;
+		dispose();
+	};
+	return {
+		ensure(opcodes) {
+			const api = host.gui?.blockEditors;
+			const signature = [...new Set(opcodes)].sort().join("\0");
+			if (disposed || api === active && signature === activeOpcodes) return;
+			dispose();
+			if (api?.apiVersion !== 1 || typeof api.registerFixedInputEditor !== "function") return;
+			try {
+				for (const definition of fixedInputEditors) if (definition.opcodes.every((opcode) => opcodes.includes(opcode))) {
+					const remove = api.registerFixedInputEditor.call(api, definition);
+					if (typeof remove !== "function") throw new TypeError("Invalid fixed registration cleanup.");
+					removers.push(remove);
+				}
+				active = api;
+				activeOpcodes = signature;
+				host.vm?.runtime?.on?.("RUNTIME_DISPOSED", shutdown);
+			} catch (error) {
+				dispose();
+				throw error;
+			}
+		},
+		dispose: shutdown
+	};
+}
 var block_definitions_default = {
 	extensionName: "Teachable Machine",
 	blocks: [
@@ -581,7 +1219,9 @@ var package_default = {
 		"dist/",
 		"README.md",
 		"LICENSE",
-		"THIRD_PARTY_NOTICES.md"
+		"THIRD_PARTY_NOTICES.md",
+		"schemas/",
+		"docs/fixed-input-editors.ja.md"
 	],
 	unpkg: "./dist/tm.js",
 	jsdelivr: "./dist/tm.js",
@@ -629,7 +1269,8 @@ var package_default = {
 		"@types/node": "^22.20.1",
 		"typescript": "^5.9.3",
 		"vite": "^8.2.2",
-		"vitest": "^4.0.14"
+		"vitest": "^4.0.14",
+		"@kubohiroya/turbowarp-extension-data-editor": "git+https://github.com/kubohiroya/turbowarp-extension-data-editor.git#485f0e550e622235624b5e9176820161aeeba252"
 	},
 	keywords: [
 		"turbowarp",
@@ -1017,7 +1658,10 @@ var TMExtension = class {
 		this.visibilityChangeListener = () => this.handleDocumentVisibilityChange();
 		if (this.featureFlags.temporalPoseScoring && typeof document !== "undefined") document.addEventListener("visibilitychange", this.visibilityChangeListener);
 	}
+	fixedEditors = fixedInputRegistration(typeof Scratch === "undefined" ? void 0 : Scratch);
 	getInfo() {
+		const visibleOpcodes = block_definitions_default.blocks.filter((block) => !block.featureFlag || this.featureFlags[block.featureFlag]).map((block) => `${EXTENSION_ID}_${block.opcode}`);
+		this.fixedEditors.ensure(visibleOpcodes);
 		return {
 			id: EXTENSION_ID,
 			name: Scratch.translate(block_definitions_default.extensionName),
@@ -2089,6 +2733,7 @@ var TMExtension = class {
 		else if (typeof Scratch !== "undefined") Scratch.vm?.runtime?.emit(ACCUMULATED_POSE_CHANGED_EVENT, payload);
 	}
 	dispose() {
+		this.fixedEditors.dispose();
 		this.stopCamera();
 		if (this.featureFlags.temporalPoseScoring && typeof document !== "undefined") document.removeEventListener("visibilitychange", this.visibilityChangeListener);
 		this.onAccumulatedPoseChanged = null;

@@ -32,7 +32,9 @@ var package_default = {
 		"dist/",
 		"README.md",
 		"LICENSE",
-		"THIRD_PARTY_NOTICES.md"
+		"THIRD_PARTY_NOTICES.md",
+		"schemas/",
+		"docs/fixed-input-editors.ja.md"
 	],
 	unpkg: "./dist/tm.js",
 	jsdelivr: "./dist/tm.js",
@@ -80,7 +82,8 @@ var package_default = {
 		"@types/node": "^22.20.1",
 		"typescript": "^5.9.3",
 		"vite": "^8.2.2",
-		"vitest": "^4.0.14"
+		"vitest": "^4.0.14",
+		"@kubohiroya/turbowarp-extension-data-editor": "git+https://github.com/kubohiroya/turbowarp-extension-data-editor.git#485f0e550e622235624b5e9176820161aeeba252"
 	},
 	keywords: [
 		"turbowarp",

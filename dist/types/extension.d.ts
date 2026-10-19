@@ -76,6 +76,7 @@ export declare function initializeCameraReadbackContext(canvas: unknown, _tensor
 export declare class TMExtension {
     [key: string]: any;
     constructor(featureFlags?: Partial<FeatureFlags>, dependencies?: TMExtensionDependencies);
+    private readonly fixedEditors;
     getInfo(): {
         id: string;
         name: any;

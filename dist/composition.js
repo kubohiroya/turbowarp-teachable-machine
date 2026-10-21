@@ -1187,7 +1187,7 @@ function confidenceMultiplier(value) {
 }
 var package_default = {
 	name: "@kubohiroya/turbowarp-teachable-machine",
-	version: "3.5.2",
+	version: "3.5.3",
 	description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
 	author: "Hiroya Kubo <hiroya@cuc.ac.jp>",
 	license: "MPL-2.0",
@@ -1257,7 +1257,7 @@ var package_default = {
 		"prepack": "npm run build && npm run release:consistency:check"
 	},
 	devDependencies: {
-		"@kubohiroya/turbowarp-camera-source": "0.17.1",
+		"@kubohiroya/turbowarp-camera-source": "0.19.0",
 		"@kubohiroya/vite-plugin-turbowarp-extension": "0.6.1",
 		"@teachablemachine/image": "0.8.5",
 		"@teachablemachine/pose": "0.8.6",
@@ -1281,13 +1281,7 @@ var package_default = {
 		"audio",
 		"camera",
 		"teachable-machine"
-	],
-	gitHead: "97ef12018789316d6170a7aab29d7c5b0a4c90f4",
-	"x-turbowarp-source": {
-		"revision": "97ef12018789316d6170a7aab29d7c5b0a4c90f4",
-		"revisionRole": "base-commit",
-		"sourceState": "local-release-overlay"
-	}
+	]
 };
 //#endregion
 //#region src/extension.ts

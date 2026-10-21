@@ -29,7 +29,6 @@ jobs:
         with:
           node-version: 24
           package-manager-cache: false
-          registry-url: https://registry.npmjs.org
       - run: corepack enable
       - run: npm install --global npm@11.5.1
       - run: pnpm install --frozen-lockfile

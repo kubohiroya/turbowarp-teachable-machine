@@ -1298,7 +1298,7 @@
       "prepack": "npm run build && npm run release:consistency:check"
     },
     devDependencies: {
-      "@kubohiroya/turbowarp-camera-source": "0.19.1",
+      "@kubohiroya/turbowarp-camera-source": "0.19.2",
       "@kubohiroya/vite-plugin-turbowarp-extension": "0.6.1",
       "@teachablemachine/image": "0.8.5",
       "@teachablemachine/pose": "0.8.6",

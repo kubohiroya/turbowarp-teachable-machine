@@ -195,6 +195,23 @@ export declare class TMExtension {
      * recognises both poses and images is not what sharing is for, and `pose` is the role name
      * Camera Source's own documentation uses for this consumer.
      */
+    /**
+     * Open the camera here, so the frames arrive at the resolution the camera itself offers.
+     *
+     * `Webcam.setup()` hands its options to `getWebcam`, which overwrites `options.width` with 640
+     * before every `getUserMedia` call it makes. A 1080p camera then negotiates 640x360 with
+     * `resizeMode: "crop-and-scale"` -- the browser downscales, and the native frame is gone before
+     * anything here can show it. The constraint cannot be passed around, only avoided: `setup()`
+     * skips `getWebcam` entirely once the element is there, which is the door the Camera Source
+     * lease already goes through.
+     *
+     * No size is asked for. That is deliberate, and it is what Camera Source passes too: both paths
+     * leave the mode to the browser and the camera rather than this extension naming one.
+     *
+     * Null where the browser has no `getUserMedia`. There the library keeps its own path, and its
+     * own error, rather than this reporting a different failure for the same missing capability.
+     */
+    private openCameraElement;
     private acquireSharedCamera;
     stopCamera(): void;
     isCameraRunning(): any;

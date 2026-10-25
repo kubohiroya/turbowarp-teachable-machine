@@ -1874,14 +1874,18 @@ var TMExtension = class {
 			if (!runtime) throw new Error("Teachable Machine: Runtime is unavailable.");
 			if (!("Webcam" in runtime)) throw new Error("Teachable Machine: Camera runtime is unavailable in the current mode.");
 			this.webcam = new runtime.Webcam(320, 240, true);
+			const selection = this.resolvedCameraSelection();
 			const lease = await this.acquireSharedCamera();
 			if (lease) {
 				this.cameraLease = lease;
 				this.webcam.webcam = lease.getFrameSource().element;
 			}
-			const constraints = lease ? void 0 : cameraConstraints(this.resolvedCameraSelection());
-			if (constraints) await this.webcam.setup(constraints);
-			else await this.webcam.setup();
+			if (!this.webcam.webcam) {
+				const element = await this.openCameraElement(cameraConstraints(selection));
+				if (element) this.webcam.webcam = element;
+			}
+			if (this.webcam.webcam) await this.webcam.setup();
+			else await this.webcam.setup(cameraConstraints(selection));
 			this.ensureCameraCanvas();
 			initializeCameraReadbackContext(this.webcam.canvas);
 			if (!lease) await this.webcam.play();
@@ -1928,6 +1932,37 @@ var TMExtension = class {
 	* recognises both poses and images is not what sharing is for, and `pose` is the role name
 	* Camera Source's own documentation uses for this consumer.
 	*/
+	/**
+	* Open the camera here, so the frames arrive at the resolution the camera itself offers.
+	*
+	* `Webcam.setup()` hands its options to `getWebcam`, which overwrites `options.width` with 640
+	* before every `getUserMedia` call it makes. A 1080p camera then negotiates 640x360 with
+	* `resizeMode: "crop-and-scale"` -- the browser downscales, and the native frame is gone before
+	* anything here can show it. The constraint cannot be passed around, only avoided: `setup()`
+	* skips `getWebcam` entirely once the element is there, which is the door the Camera Source
+	* lease already goes through.
+	*
+	* No size is asked for. That is deliberate, and it is what Camera Source passes too: both paths
+	* leave the mode to the browser and the camera rather than this extension naming one.
+	*
+	* Null where the browser has no `getUserMedia`. There the library keeps its own path, and its
+	* own error, rather than this reporting a different failure for the same missing capability.
+	*/
+	async openCameraElement(constraints) {
+		const mediaDevices = typeof navigator === "undefined" ? void 0 : navigator.mediaDevices;
+		if (typeof mediaDevices?.getUserMedia !== "function") return null;
+		const stream = await mediaDevices.getUserMedia({ video: constraints ?? true });
+		const video = document.createElement("video");
+		video.autoplay = true;
+		video.muted = true;
+		video.playsInline = true;
+		video.addEventListener("loadedmetadata", () => {
+			video.width = video.videoWidth;
+			video.height = video.videoHeight;
+		});
+		video.srcObject = stream;
+		return video;
+	}
 	async acquireSharedCamera() {
 		const cameraSource = readCameraSource(Scratch.vm?.runtime);
 		if (!cameraSource) return null;

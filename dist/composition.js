@@ -1306,7 +1306,7 @@ var EXTENSION_ID = "kubohiroyatm";
 var VERSION = `${package_default.version}-typescript`;
 var DOCS_URI = "https://kubohiroya.github.io/turbowarp-teachable-machine/";
 var ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANGED";
-var BLOCK_ICON_URI = `data:image/svg+xml,${encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><g fill=\"none\" stroke=\"#fff\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 21V8h13M43 8h13v13M8 43v13h13M43 56h13V43M32 25v15M20 31l12 5 12-5M32 40 23 52M32 40l9 12\"/><circle cx=\"32\" cy=\"18\" r=\"5\"/></g></svg>")}`;
+var BLOCK_ICON_URI = `data:image/svg+xml,${encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 48 48\"><circle cx=\"24\" cy=\"15\" r=\"4\" fill=\"#4C97FF\"/><path d=\"M24 20v10M24 23l-7 4M24 23l7 4M24 30l-5 9M24 30l5 9\" fill=\"none\" stroke=\"#4C97FF\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M9 15V9h6M39 15V9h-6M9 33v6h6M39 33v6h-6\" fill=\"none\" stroke=\"#59C059\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>")}`;
 /**
 * Put keypoints where the preview shows them: in the camera frame's own space.
 *

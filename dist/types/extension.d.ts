@@ -256,6 +256,17 @@ export declare class TMExtension {
      * preview only where there is no video to show, which is the same place inference falls back to
      * it.
      */
+    /**
+     * Hand the preview over to the camera's own video once the camera says how big its frames are.
+     *
+     * `Webcam.setup()` resolves as soon as `getUserMedia` does and only then registers the
+     * `loadedmetadata` listener, so the first attach can land while `videoWidth` is still 0 -- and
+     * while it is, the readback canvas is the only thing that can be shown. The handover has to
+     * happen when the size arrives, or the preview keeps the 320x240 upscale this extension stopped
+     * showing, and freezes on top of that: the frame loop draws the readback canvas only while that
+     * canvas is the preview.
+     */
+    refreshPreviewSource(): void;
     previewSourceElement(): any;
     attachPreviewToStage(): void;
     /**

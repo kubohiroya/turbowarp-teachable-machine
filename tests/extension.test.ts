@@ -1587,6 +1587,41 @@ describe('camera preview', () => {
     expect(extension.poseOverlaySvg.getAttribute('viewBox')).toBe('0 0 1920 1080');
   });
 
+  it('takes over the preview once the camera reports its size', async () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    const video = createElement('VIDEO') as unknown as {
+      videoWidth: number;
+      videoHeight: number;
+      style: Record<string, string>;
+    };
+    // Metadata has not arrived yet, so the camera cannot say how big its frames are.
+    video.videoWidth = 0;
+    video.videoHeight = 0;
+    const update = vi.fn();
+    const extension = new TMExtension({poseOverlay: true});
+    extension.webcam = {canvas, webcam: video, update} as never;
+    extension.cameraRunning = true;
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+    vi.stubGlobal('requestAnimationFrame', () => 0);
+
+    extension.attachPreviewToStage();
+    // Only the readback canvas can be shown while the frame size is unknown.
+    expect(extension.previewCanvas).toBe(canvas);
+
+    video.videoWidth = 1920;
+    video.videoHeight = 1080;
+    await extension.loop();
+
+    // The camera's own frames are available now, so the preview has to become the video. Leaving
+    // the readback canvas in place would both show 320x240 upscaled and freeze it, because the
+    // frame loop draws that canvas only while it is itself the preview.
+    expect(extension.previewCanvas).toBe(video);
+    expect(stage.children).toContain(video);
+    expect(stage.children).not.toContain(canvas);
+    expect(extension.poseOverlaySvg.getAttribute('viewBox')).toBe('0 0 1920 1080');
+  });
+
   it('mirrors the video for the mode that leaves the readback canvas alone', () => {
     const stage = createElement();
     const canvas = createElement('CANVAS');
@@ -1621,6 +1656,7 @@ describe('per-frame cost', () => {
     vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
     // One frame is the question; the loop asks for the next through requestAnimationFrame.
     vi.stubGlobal('requestAnimationFrame', () => 0);
+    extension.attachPreviewToStage();
 
     await extension.loop();
 
@@ -1638,6 +1674,7 @@ describe('per-frame cost', () => {
     vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
     // One frame is the question; the loop asks for the next through requestAnimationFrame.
     vi.stubGlobal('requestAnimationFrame', () => 0);
+    extension.attachPreviewToStage();
 
     await extension.loop();
 

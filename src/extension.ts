@@ -1396,6 +1396,24 @@ export class TMExtension {
    * preview only where there is no video to show, which is the same place inference falls back to
    * it.
    */
+  /**
+   * Hand the preview over to the camera's own video once the camera says how big its frames are.
+   *
+   * `Webcam.setup()` resolves as soon as `getUserMedia` does and only then registers the
+   * `loadedmetadata` listener, so the first attach can land while `videoWidth` is still 0 -- and
+   * while it is, the readback canvas is the only thing that can be shown. The handover has to
+   * happen when the size arrives, or the preview keeps the 320x240 upscale this extension stopped
+   * showing, and freezes on top of that: the frame loop draws the readback canvas only while that
+   * canvas is the preview.
+   */
+  refreshPreviewSource() {
+    if (!this.webcam || !this.previewStageElement) return;
+    const source = this.previewSourceElement();
+    if (!source || source === this.previewCanvas) return;
+    this.previewCanvas?.parentNode?.removeChild(this.previewCanvas);
+    this.attachPreviewToStage();
+  }
+
   previewSourceElement() {
     const video = this.webcam?.webcam;
     return video && video.videoWidth > 0 ? video : this.webcam?.canvas;
@@ -1567,8 +1585,10 @@ export class TMExtension {
     try {
       // Drawing the readback canvas costs a Canvas2D pass and a fresh canvas allocation every
       // frame. Nothing reads it while the camera's own video is the preview and the model is fed
-      // tensors, so it is drawn only where it is still the answer.
-      if (this.previewSourceElement() !== this.webcam.webcam) this.webcam.update();
+      // tensors, so it is drawn only while it is itself what the stage shows.
+      if (this.previewCanvas && this.previewCanvas !== this.webcam.webcam) this.webcam.update();
+      // Drawn first, so a handover that fails leaves a live preview rather than a frozen one.
+      this.refreshPreviewSource();
       if (this.recognizing && this.model) {
         const model = this.model;
         const recognitionMode = this.recognitionMode;

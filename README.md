@@ -2,23 +2,15 @@
 
 <img src="assets/block-icon.svg" alt="" width="48" height="48">
 
-Use a [Teachable Machine](https://teachablemachine.withgoogle.com/) pose, image, or audio model as
-an input for TurboWarp projects. The extension turns each camera frame or microphone window into labels,
-confidence scores, and Boolean conditions that Scratch-style scripts can use.
+[English](README.md) | [日本語](README.ja.md)
 
-TurboWarp Teachable Machine uses the Scratch extension ID `kubohiroyatm` from the 2.x release line onward to
-avoid short-ID collisions while the package, repository, Pages URL, and browser build use
-`turbowarp-teachable-machine`.
+Use a published [Teachable Machine](https://teachablemachine.withgoogle.com/) pose, image, or audio
+model as an input for TurboWarp projects. Every camera frame or microphone window becomes a label, a
+confidence score, and Boolean conditions that Scratch-style scripts can act on.
 
-> The package, repository, and Pages URL were previously named `turbowarp-tm`
-> (`@kubohiroya/turbowarp-tm`, last published as 3.2.0). Replace that name with
-> `turbowarp-teachable-machine` in CDN URLs, `pnpm add`, and `import` specifiers.
+**User guide:** [English](https://kubohiroya.github.io/turbowarp-teachable-machine/) | [日本語](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/) · **[Block reference](#blocks)**
 
-**[Open the illustrated user guide (English)](https://kubohiroya.github.io/turbowarp-teachable-machine/)** ·
-**[日本語ガイド](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/)** ·
-[Block reference](#blocks)
-
-## What The Extension Does
+## What it does
 
 ```mermaid
 flowchart LR
@@ -28,59 +20,53 @@ flowchart LR
     Scores --> Blocks["TurboWarp blocks"]
 ```
 
-- loads a published Teachable Machine Pose, Image, or Audio model;
-- switches recognition mode between `pose`, `image`, and `audio` before input startup;
-- starts and stops the camera independently from recognition;
-- places a configurable camera preview over the TurboWarp stage;
-- optionally overlays configurable SVG pose joints and bones on that preview in pose mode;
-- reports the best label, its confidence, and the confidence of any named label;
-- tests labels with a fixed or custom confidence threshold;
-- optionally smooths decisions with time-decayed accumulated scores;
-- reports startup timings and explicit runtime errors.
+- Loads a published Teachable Machine pose, image, or audio model from its model folder URL.
+- Switches recognition between `pose`, `image`, and `audio` before the input starts.
+- Starts and stops the camera independently from recognition.
+- Places a camera preview over the stage, at six positions, with adjustable opacity and mirroring.
+- Draws an optional SVG overlay of pose joints and bones on that preview.
+- Reports the best label, its confidence, and the confidence of any named class.
+- Tests a label against a fixed or custom confidence threshold.
+- Smooths flickering decisions with time-decayed accumulated scores.
+- Reports startup timings and the last runtime error.
 
-The [illustrated guide](https://kubohiroya.github.io/turbowarp-teachable-machine/) explains the complete flow,
-preview layout, score behavior, privacy, and troubleshooting. English is the default; the
-[Japanese version](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/) has the same content.
+Recognition runs in the browser. Camera frames and microphone audio are never uploaded; only the
+runtime libraries and the published model are fetched.
 
 ## Requirements
 
-- a published Teachable Machine Pose, Image, or Audio model URL;
-- a camera or microphone and permission to use it in the browser;
-- network access for the reviewed Teachable Machine browser runtime and the model files;
-- TurboWarp's **Run without sandbox** option, which is only available when the extension is
-  loaded from a file (see [Installation](#installation)).
+- A published Teachable Machine pose, image, or audio model URL — the model folder URL, not the
+  editor URL.
+- A camera or microphone, and browser permission to use it.
+- Network access for the reviewed Teachable Machine browser runtime and the model files.
+- TurboWarp's **Run without sandbox** option, which only exists when the extension is loaded from a
+  file. See [Installation](#installation).
 
 > [!IMPORTANT]
-> This is an unsandboxed extension because it needs camera, microphone, and stage access. Only load extension
-> code you trust. Camera APIs also require a secure browser context such as HTTPS or localhost.
+> This extension is unsandboxed because it needs camera, microphone, and stage access. Load
+> extension code only from sources you trust. Camera APIs also require a secure browser context
+> such as HTTPS or `localhost`.
 
 ## Installation
 
-Download [`dist/tm.js`](dist/tm.js), then in TurboWarp's custom extension dialog open the
-**Files** tab, select that file, and keep **Run without sandbox** enabled.
+Download [`dist/tm.js`](dist/tm.js). In TurboWarp's custom extension dialog, open the **Files** tab,
+select that file, and keep **Run without sandbox** enabled.
 
 > [!IMPORTANT]
 > The dialog's **URL** tab cannot load this extension. TurboWarp always sandboxes an extension
-> loaded from an untrusted URL — the URL tab has no **Run without sandbox** option at all — and TM
-> refuses to start sandboxed because it needs camera, microphone, and stage access. Pasting the
-> jsDelivr link below into the URL tab leaves the dialog waiting with no message on screen and only
-> `TM must run without the extension sandbox.` in the browser console. Download the file and use
-> the **Files** tab instead.
+> loaded from an untrusted URL — the URL tab has no **Run without sandbox** option at all — and this
+> extension refuses to start sandboxed. Pasting the jsDelivr link below into the URL tab leaves the
+> dialog waiting with nothing on screen and only `TM must run without the extension sandbox.` in the
+> browser console. Download the file and use the **Files** tab.
 
-That download, and the artifact a composite runtime fetches, is the version-pinned build on
-jsDelivr:
+The download, and the artifact a composite runtime fetches, is the version-pinned build on jsDelivr:
 
 ```text
 https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.6/dist/tm.js
 ```
 
-The standalone extension loads one reviewed browser runtime that contains one TensorFlow.js 4.22.0
-module graph together with Teachable Machine Pose 0.8.6, Teachable Machine Image 0.8.5, and
-TensorFlow.js Speech Commands 0.5.4. That runtime ships the WebGL and CPU kernels; the WebGPU and
-WebAssembly backends live in separate bundles next to it and are fetched only when a project uses
-them. See [Compute backends](#compute-backends).
-Composite runtimes can load or embed the same artifact without rewriting a minified third-party
-bundle:
+A composite runtime can load or embed the same reviewed artifact without rewriting a minified
+third-party bundle:
 
 ```text
 https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.6/dist/runtime.js
@@ -92,254 +78,22 @@ To add the published package to another project:
 pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.6
 ```
 
-### Offline PoseNet bundle API
+### Names
 
-`@kubohiroya/turbowarp-teachable-machine/posenet` owns the fixed PoseNet MobileNetV1 0.75 / stride 16
-manifest, package asset specifiers, SHA-256 verification, bounded Base64 project descriptor, and
-the Teachable Machine Pose fetch adapter. Host applications only decide where that explicit model
-descriptor is stored. The model stays as one JSON file and two binary shards; it is never disguised
-as an image, sound, or costume.
+The Scratch extension ID is `kubohiroyatm`, from the 2.x release line onward, so that it does not
+collide with other short IDs. The package, repository, Pages URL, and browser build all use
+`turbowarp-teachable-machine`.
 
-```js
-import {readFile} from 'node:fs/promises';
-import {
-  createBundledTMRuntime,
-  createPoseNetProjectBundleFromLoader,
-} from '@kubohiroya/turbowarp-teachable-machine/posenet';
-
-const projectBundle = await createPoseNetProjectBundleFromLoader((file) =>
-  readFile(new URL(import.meta.resolve(file.packageSpecifier))),
-);
-
-// A browser host can store projectBundle in its own project-data channel.
-// Decode and hash verification start only on the first loadFromFiles() call.
-const offlineRuntime = createBundledTMRuntime({
-  runtime: tmPose,
-  projectBundle,
-});
-```
-
-The model supply contains exactly 5,082,500 bytes. Its three SHA-256 operations run independently,
-and the first shared verification overlaps the Teachable Machine classifier load. The intercepted
-PoseNet fetch never exposes bytes until that verification succeeds. Later model requests reuse the
-same verified supply. Tampering, missing or incorrectly sized files, and unexpected PoseNet network
-requests fail closed with `TM-POSENET-*` error codes.
-
-### Composition API
-
-Composite runtimes can import `@kubohiroya/turbowarp-teachable-machine/composition` without registering the
-Standalone extension or adding blocks. The caller supplies an already-bundled Teachable Machine
-Pose runtime and validated model bytes, so this path does not download runtime scripts or model
-files.
-
-```js
-import {createTMComposition} from '@kubohiroya/turbowarp-teachable-machine/composition';
-
-const pose = createTMComposition({
-  runtime: bundledTMRuntime,
-  modelInitializationPolicy: 'latest-needed',
-  // Optional latency-first mode; it remains off by default.
-  // parallelModelInitialization: true,
-});
-const cameras = await pose.listCameraDevices();
-if (cameras[0]) await pose.selectCamera({deviceId: cameras[0].deviceId});
-const modelDemand = new AbortController();
-await pose.registerPoseModel(
-  {
-    name: 'RescuePose',
-    files: [
-      {path: 'model.json', bytes: modelBytes},
-      {path: 'weights.bin', bytes: weightsBytes},
-      {path: 'metadata.json', bytes: metadataBytes},
-    ],
-  },
-  {signal: modelDemand.signal},
-);
-pose.activatePoseModel('RescuePose');
-pose.setPreviewOpacity(0.2);
-pose.setPreviewPosition('full-stage');
-pose.setPreviewMirroring('unmirrored');
-pose.setPoseJointStyle('leftWrist', {color: '#ff00aa', opacity: 0.8, radius: 6});
-pose.setPoseBoneStyle({color: '#00e5ff', opacity: 0.9, width: 3});
-pose.setPoseOverlayMinimumConfidence(0.5);
-pose.setPoseOverlayConfidenceScaling({
-  jointOpacity: true,
-  jointRadius: true,
-  boneOpacity: true,
-  boneWidth: true,
-});
-pose.configureAccumulatedPose({
-  accumulationPerSecond: 1,
-  decayPerSecond: 0.9,
-  scoreThreshold: 0,
-});
-const unsubscribe = pose.subscribeAccumulatedPose((event) => {
-  // event.poseName is the one currently selected candidate, or an empty string.
-});
-await pose.startRecognition();
-```
-
-Each composition owns its model registry, active model, camera, and recognition state. Release one
-model with `releasePoseModel(name)` or release the complete instance with `releaseAll()`. Calling
-`releaseAll()` also removes accumulated-pose listeners. `subscribeAccumulatedPose()` returns an
-idempotent unsubscribe function.
-
-`releasePoseModel(name)` stops recognition when the selected model is active and disposes only that
-model. It does not stop the camera stream. Camera capture is an independent lifecycle: stop it with
-`stopCamera()`, or release the complete composition with `releaseAll()`.
-
-The default `modelInitializationPolicy` is `legacy`, preserving independent registration calls.
-Opt in to `latest-needed` when a host has one current label-model demand, such as a story that can
-skip scenes. At most one heavy runtime load is active and one latest request is pending. A newer
-request cancels the active request cooperatively and replaces an older request that has not started.
-For A loading, then B pending, then C requested, B never reaches the TensorFlow loader; A is cleaned
-up at its next safe boundary and only C starts afterward.
-Repeated `latest-needed` registrations with the same name, byte-identical files, and the same
-`AbortSignal` share one pending operation instead of invoking the runtime twice. Different signals
-remain separate demands so cancelling one caller cannot silently cancel another caller's work.
-
-Pass an optional `AbortSignal` to `registerPoseModel()` when the host no longer needs that demand. A
-queued request rejects with `AbortError` without invoking the runtime. TensorFlow.js 4.22.0 and Web
-Crypto do not expose physical cancellation for every operation already in progress, so a running
-request becomes stale immediately, starts no later phase where the runtime provides a boundary, and
-disposes every late classifier/PoseNet result exactly once before its promise settles. A cancelled
-model is never published in the registry. Shared fixed-PoseNet verification may finish and remain
-cached when the next latest request also needs it. Model cancellation does not stop the camera.
-
-The composition API does not infer scene or action reachability. A host should retain the signal when the same
-model is needed by an imminent action, abort it when a skipped path has no nearby pose demand, or
-submit the replacement model when a skip changes that demand. `releaseAll()` cancels both active and
-pending registration work and waits for safe cleanup.
-
-Runtime model phases remain sequential by default. Cancellation is checked after TensorFlow
-readiness, classifier loading, metadata parsing, and PoseNet loading, so a skipped demand does not
-start the next expensive phase. Set `parallelModelInitialization: true` on the composition or
-`createBundledTMRuntime()` only when lower startup latency is more important than those phase
-boundaries. That opt-in starts classifier, metadata, and PoseNet initialization together; work
-already accepted by TensorFlow cannot be physically interrupted, but every completed stale resource
-is still disposed before cancellation settles. The `latest-needed` queue continues to permit only
-one active demand and one newest pending demand in either mode.
-
-`setPreviewMirroring('mirrored' | 'unmirrored')` changes only the camera preview. It can be called
-before camera startup, while the camera is running, or after it has stopped. The default remains
-`mirrored`, and the recognition input keeps the Teachable Machine runtime's existing horizontal
-flip regardless of the preview setting.
-
-`setPreviewOpacity()` accepts a finite number from `0` to `1` and applies before or after camera
-startup. `setPreviewPosition()` accepts `top-left`, `top-right`, `bottom-left`, `bottom-right`,
-`center`, or `full-stage`. `hidePreview()` and `showPreview()` change only preview visibility; they
-do not stop or restart the camera stream. Use `stopCamera()` when the MediaStream tracks must be
-released.
-
-The composition API enables its SVG pose overlay and exposes `showPoseOverlay()`,
-`hidePoseOverlay()`, and `isPoseOverlayVisible()`. `setPoseJointStyle()` configures the CSS color,
-opacity, and radius for any of the 17 PoseNet joint names. `setPoseBoneStyle()` configures the color,
-opacity, and width shared by the 12 standard PoseNet bone connections. Opacity must be from `0` to
-`1`; radii and widths must be finite and non-negative. `setPoseOverlayMinimumConfidence()` accepts
-`0` through `1` and hides a bone when either endpoint is below the threshold.
-
-`setPoseOverlayConfidenceScaling()` independently controls `jointOpacity`, `jointRadius`,
-`boneOpacity`, and `boneWidth`. An enabled joint property is multiplied by that joint's confidence,
-clamped to `0`–`1`. An enabled bone property is multiplied by the lower confidence of its two
-endpoints. Hiding the overlay does not stop recognition. Hiding the camera preview also hides the
-overlay, while stopping recognition clears every SVG mark and stopping the camera removes the SVG
-element.
-
-`listCameraDevices()` performs a fresh browser enumeration on every call. It returns a deeply
-frozen canonical copy containing only unique, non-empty video device IDs in enumeration order;
-labels remain the empty string when permission has not made them available. Empty IDs are omitted,
-and the first occurrence wins when an ID is duplicated. Enumeration failures use
-`TM-COMPOSITION-012` and never expose `MediaDeviceInfo`, `MediaStreamTrack`, or a stream.
-
-Select `default`, `front`, or `back` as a camera preference, or wrap a session-only browser ID as
-`{deviceId}`. The object form is intentionally distinct, so a physical device whose ID is literally
-`default`, `front`, or `back` is not mistaken for a preference. A selection can be made before
-camera startup or while recognition is running. Running switches preserve the prepared model,
-recognition state, and all preview settings. Concurrent selections run in call order; a failed
-switch restores the preceding successful camera and selection. Invalid selections use
-`TM-COMPOSITION-011`. `getCameraSelection()` returns an isolated immutable copy, and
-`getActiveCamera()` returns an immutable `{deviceId, label}` only while an identifiable camera is
-running. The extension never persists device IDs. `releaseAll()` rejects queued selection work, waits for
-an in-progress switch to become quiescent, and then stops the final stream; all four camera-device
-methods fail closed after release.
-
-The extension owns the camera canvas used by Teachable Machine and TensorFlow.js and requests a normal
-Canvas2D context for it. Physical-camera measurements of its 320x240, one-draw/one-read path
-did not show a repeatable end-to-end benefit from `willReadFrequently`; that hint improved a
-different read-heavy condition with four or more reads per draw, but could make video drawing more
-expensive. Chrome may therefore emit its Canvas2D readback warning during CPU inference. Preview
-rendering and model input continue to use the same canvas, and no downstream Canvas prototype or
-Console patch is required. Reconsider the hint only with a reproducible benchmark of this exact
-camera path.
-
-Teachable Machine Pose 0.8.6 exposes the classifier as `CustomPoseNet.model` and PoseNet as
-`CustomPoseNet.posenetModel`, while its top-level `dispose()` releases PoseNet only. The composition
-therefore disconnects an active model from recognition first and disposes those two public
-resources separately and exactly once; it does not call the incomplete top-level disposer for this
-official shape. A custom injected runtime without those fields can retain the legacy single
-top-level `dispose()` contract. A runtime that exposes only part of the official shape is rejected
-with `TM-COMPOSITION-009`, after every safely identifiable resource has been attempted.
-
-Model, weights, and metadata `File` objects exist only for the pending `loadFromFiles()` call and
-are not stored in the named registry. `releasePoseModel()` and `releaseAll()` invalidate and wait for
-matching pending registrations, so their promises do not resolve before a late loaded model has
-been disposed. Switching to an already prepared model after stopping recognition keeps the camera
-stream alive; releasing the old, no-longer-active model does not request camera permission again.
-Releasing the current model with no prepared successor stops recognition but keeps the camera
-stream alive. `stopCamera()` and `releaseAll()` stop the stream explicitly.
-
-The accumulated-pose API chooses one candidate for an async-input consumer. It is deliberately
-separate from an Actor action that waits for multiple pose steps in sequence: a sequence consumer
-should read `confidenceOf(name)` and own its per-step progress instead of using or resetting this
-candidate-selection state.
-
-Accumulated scores use elapsed wall-clock seconds, not recognition counts:
-
-```text
-nextScore = previousScore * decayPerSecond^elapsedSeconds
-          + confidence * accumulationPerSecond * elapsedSeconds
-```
-
-`accumulationPerSecond` is a finite number greater than or equal to zero. `decayPerSecond` is the
-finite fraction retained per second from zero through one; a changed decay takes effect in the next
-recognition session. `scoreThreshold` is a finite number greater than or equal to zero. An event is
-published only when the selected pose name changes, including one transition to an empty name on
-reset or stop; score-only changes do not publish another event. The standalone extension enables
-temporal scoring and keeps only the event feature flag off by default.
-
-## Upgrading from 2.x
-
-The block surface, the composition API, and the offline PoseNet bundle API are unchanged. A project
-built on 2.x keeps working after swapping the extension file. New blocks appear that 2.x did not
-have: three for compute backends, and six for accumulated pose scoring.
-
-What changed is the runtime this extension bundles.
-
-| | 2.x | 3.0.0 |
-|---|---|---|
-| TensorFlow.js | 1.3.1 | 4.22.0 |
-| Teachable Machine Pose | 0.8.3 | 0.8.6 |
-| TensorFlow.js Speech Commands | 0.4.0 | 0.5.4 |
-| Compute backends | WebGL only | WebGPU, WebGL, WASM, CPU, negotiated at load |
-
-That runtime is published as `globalThis.tf`, so a host application reading it directly moves from
-the TensorFlow.js 1.x API to 4.x — the reason this is a major release. Models exported by Teachable
-Machine are not affected: pose, image, and audio models exported for the 1.x-era libraries load and
-run unchanged on 4.22.0.
-
-Two behavioral notes for existing projects:
-
-- With no `set compute mode to` block, recognition now negotiates a backend instead of always using
-  WebGL. `active compute backend` reports which one won, and `last error` explains any substitution.
-- The first `start camera` or `load model` downloads a larger runtime than 2.x did (1.24 MB versus
-  1.04 MB), so plan the startup sequence accordingly. See [Compute backends](#compute-backends).
+> The package, repository, and Pages URL were previously named `turbowarp-tm`
+> (`@kubohiroya/turbowarp-tm`, last published as 3.2.0). Replace that name with
+> `turbowarp-teachable-machine` in CDN URLs, `pnpm add`, and `import` specifiers.
 
 ## Quick start
 
 1. Train classes such as `jump`, `card`, or `clap` in Teachable Machine.
 2. Export the model, upload it, and copy the model folder URL.
 3. Set that URL with `set model URL to [URL]`.
-4. Run `start recognition`, allow camera or microphone access, and use a result block in your script.
+4. Run `start recognition`, allow camera or microphone access, and read a result block.
 
 ```text
 when green flag clicked
@@ -353,208 +107,361 @@ forever
 end
 ```
 
-`start recognition` starts the required input and loads the configured model when necessary. Pose and
-image modes use the camera; audio mode uses the microphone. A separate `start camera` or `load model`
-step is only needed when a camera project wants to control startup phases individually.
+`start recognition` starts the input it needs and loads the configured model when necessary. Pose
+and image modes use the camera; audio mode uses the microphone. A separate `start camera` or
+`load model` step is only needed when a project wants to control the startup phases itself — for
+example to show the preview before the model is ready, or to read `model load time (ms)`.
 
 ## Compute backends
 
-Recognition runs on a TensorFlow.js compute backend. `set compute mode to [MODE]` chooses it and
+Recognition runs on a TensorFlow.js compute backend. `set compute mode to [MODE]` chooses one and
 `active compute backend` reports the one actually in use.
 
 | Mode | What it does |
 |---|---|
-| `auto` (default) | Tries WebGPU, WebGL, WASM, and CPU in that order and keeps the first one that activates and computes a verification convolution correctly |
-| `webgpu` | Modern GPU path with the lowest per-operation overhead |
+| `auto` (default) | Tries WebGPU, WebGL, WASM, and CPU in that order, keeping the first that activates and computes a verification convolution correctly |
+| `webgpu` | Modern GPU path, lowest per-operation overhead |
 | `webgl` | The long-standing GPU path, available in every browser this extension supports |
 | `wasm` | SIMD WebAssembly kernels; steady on machines with weak or unreliable GPU drivers |
-| `cpu` | Plain JavaScript kernels; correct everywhere and slowest |
+| `cpu` | Plain JavaScript kernels; correct everywhere, and slowest |
 
-A named mode is still only a preference. If the browser cannot provide it, the same order takes
-over, `active compute backend` shows what won, and `last error` explains the substitution. That is
-why a project should read `active compute backend` rather than assume the requested mode.
-
-```text
-when green flag clicked
-set compute mode to [webgpu]
-set model URL to [https://teachablemachine.withgoogle.com/models/.../]
-start recognition
-```
-
-The reviewed browser runtime carries the WebGL and CPU kernels. The WebGPU and WebAssembly backends
-are separate bundles next to `dist/runtime.js`, fetched only when a project reaches for them, and
-the WebAssembly binaries come from `dist/wasm/` in this same package. Everything resolves against
-the one TensorFlow.js instance the runtime published, so no page ever runs two TensorFlow.js cores.
+A named mode is a preference, not a guarantee. When the browser cannot provide it the same order
+takes over, `active compute backend` shows what won, and `last error` explains the substitution.
+Read `active compute backend` rather than assuming the requested mode.
 
 TensorFlow.js binds every tensor to the backend that was active when the tensor was created, so the
 mode has to be settled before a model loads. Changing the mode therefore releases a model that was
 loaded from a URL, and the next `load model` or `start recognition` rebuilds it on the new backend.
 Changing the mode during recognition, or while a host-prepared model is active, is refused instead.
 
-Host applications reach the same negotiation through the composition API:
+The reviewed browser runtime carries the WebGL and CPU kernels. WebGPU and WebAssembly live in
+separate bundles next to `dist/runtime.js`, fetched only when a project reaches for them, with the
+WebAssembly binaries coming from `dist/wasm/` in this same package. Everything resolves against the
+one TensorFlow.js instance the runtime published, so no page ever runs two TensorFlow.js cores.
 
-```js
-const composition = createTMComposition({
-  runtime: tmPose,
-  compute: tmCompute, // published by dist/runtime.js
-  computeMode: 'auto',
-});
-
-const selection = await composition.selectComputeBackend('webgpu');
-// selection.backend === 'webgpu' | 'webgl' | 'wasm' | 'cpu'
-// selection.fallback === true when the requested backend was unusable
-```
-
-`selectComputeBackend()` is rejected with `TM-COMPOSITION-018` while pose models are registered,
-because their tensors live in the memory of the backend that loaded them. Release them first.
-
-## Reading recognition results
+## Reading results
 
 | Block | Result |
 |---|---|
-| `current label` | Class with the highest probability in the latest frame |
-| `confidence` | Current label probability, rounded to two decimal places |
-| `confidence of [NAME]` | Probability of one named class |
+| `current label` | The class with the highest probability in the latest frame |
+| `confidence` | That class's probability, rounded to two decimal places |
+| `confidence of [NAME]` | The probability of one named class |
 | `label is [NAME]?` | Whether the named class has at least `0.75` confidence |
-| `label is [NAME] with confidence at least [THRESHOLD]?` | Same test with a custom `0`–`1` threshold |
+| `label is [NAME] with confidence at least [THRESHOLD]?` | The same test with a custom `0`–`1` threshold |
 
-Live confidence reacts quickly and can fluctuate near a decision boundary. Better training data,
-lighting or audio quality, camera or microphone framing, and a suitable threshold usually improve
-the result.
+Live confidence reacts quickly and fluctuates near a decision boundary. Better training data,
+lighting or audio quality, framing, and a threshold chosen for the project usually matter more than
+anything this extension can do for you. When a decision should survive a single bad frame, use
+[accumulated pose scoring](#accumulated-pose-scoring) instead of raising the threshold.
 
-## Camera selection, preview, and stopping
+## Camera, preview, and what the model sees
 
-Use `refresh camera list` to detect video inputs, then choose `default camera`, `front camera`,
-`back camera`, or a detected device with `set camera to [CAMERA]`. Camera labels may be unavailable
-until the browser grants camera permission. Device IDs are browser- and machine-specific, so use
-the portable front/back choices when a project moves between devices. Changing the selection while
-the camera is running restarts only the camera stream, preserving the loaded model, recognition
-state, and preview settings. If switching fails, the extension attempts to restore the previous camera and
-records the error in `last error`.
+### Choosing a camera
 
-`camera count` reports the latest refreshed count. `camera device ID` and `camera device name`
-report the active input when the browser provides those values.
+`refresh camera list` detects video inputs. `set camera to [CAMERA]` then selects `default camera`,
+`front camera`, `back camera`, or one detected device. Labels may stay empty until the browser
+grants camera permission, and device IDs are browser- and machine-specific, so prefer the portable
+front/back choices when a project moves between devices.
 
-The preview is a camera canvas placed over the TurboWarp stage. It can be shown, hidden, moved to
-six stage positions, made transparent, or expanded to fill the stage. Hiding the preview does not
-stop recognition. The preview is mirrored by default. Use `set camera preview to [MIRRORING]` to
-switch between `mirrored` and `unmirrored`, including while the camera is running. This display-only
-setting does not change the frames used for recognition. The `camera preview mirroring` reporter
-returns the current setting.
+Changing the selection while the camera runs restarts only the camera stream and preserves the
+loaded model, the recognition state, and every preview setting. A failed switch restores the
+previous camera and records the reason in `last error`. `camera count`, `camera device ID`, and
+`camera device name` report the latest refreshed count and the active input.
 
-- `stop recognition` clears current results, stops audio listening, but leaves the camera available;
-- `stop camera` also stops recognition, releases the camera, and removes the preview and SVG.
+### The preview and the model input
+
+The preview is the camera's own video element placed over the stage, at the camera's resolution and
+aspect ratio. It can be shown, hidden, moved to six positions, made transparent, or expanded to
+fill the stage, and it is mirrored by default — `set camera preview to [MIRRORING]` switches that,
+including while the camera runs. Mirroring is display-only.
+
+The model is fed a square centre crop of the frame, mirrored, as a tensor. `fromPixels` uploads the
+video to a texture on the WebGL and WebGPU backends and the crop and mirroring are tensor ops, so
+no Canvas2D stage sits between the camera and the model. The square also makes PoseNet's padding
+zero.
+
+- `stop recognition` clears current results and stops audio listening, but leaves the camera
+  available.
+- `stop camera` also stops recognition, releases the camera, and removes the preview and the SVG
+  overlay.
+
+Hiding the preview does not stop recognition.
 
 ### Sharing one camera with other extensions
 
-When [TurboWarp-Camera-Source](https://github.com/kubohiroya/turbowarp-camera-source) is loaded, this
-extension takes a lease on the camera it shares under the `pose` role instead of opening a device of
-its own. One physical camera then serves recognition and anything else reading frames — a QR reader,
-a preview, another classifier — rather than each extension competing for the device.
+When [TurboWarp-Camera-Source](https://github.com/kubohiroya/turbowarp-camera-source) is loaded,
+this extension takes a lease on the camera it shares under the `pose` role instead of opening a
+device of its own. One physical camera then serves recognition and anything else reading frames — a
+QR reader, a preview, another classifier — rather than each extension competing for the device.
 
 Camera Source owns the stream: it stops the camera when the last lease is released, and `stop
-camera` here releases this extension's lease without stopping tracks that other consumers may still
-be reading. The frames recognition sees are unchanged either way.
+camera` here releases only this extension's lease. Camera Source is not required; without it the
+extension opens and stops its own camera exactly as before, and a project needs no edit either way.
 
-Camera Source is not required. It is a separate extension, and this one is also loaded directly by
-URL, so when it is absent the extension opens and stops its own camera exactly as before. Nothing
-in a project needs to change for either configuration.
+## Pose overlay
 
-3.5.0 changes what the stage shows and what the model is fed. The preview is the camera's own
-video rather than a 320×240 readback canvas scaled to fit, so it carries the camera's resolution
-and aspect ratio. The model is fed the whole square centre crop as a tensor; the canvas used to
-hold only its top 240 rows, so a quarter of the subject's height never reached it. Blocks,
-opcodes and the composition API are unchanged, and a project needs no edit — but a pose model
-will see a subject it was not seeing before, which is the point.
+The `poseOverlay` feature flag is **on by default**, so the overlay blocks are in the palette:
+visibility, per-joint circle colour/opacity/radius for the 17 PoseNet joints, shared bone
+colour/opacity/width for the 12 standard connections, a minimum keypoint confidence, and confidence
+scaling.
 
-3.5.1 fixes what image models are fed. Image mode handed `predict` the camera's video element
-without asking for mirroring, so the model saw unmirrored pixels while Teachable Machine had
-trained it on a preview mirrored in CSS. The square it sees was already the frame's centre crop;
-only the mirroring was missing, and pose and image mode now feed the same square the same way
-round. Pose recognition is unchanged.
+The overlay's SVG coordinate system is the camera frame's own, so it follows a camera of any
+resolution or aspect ratio and honours all six preview positions and preview mirroring.
 
-Leasing is fixed in 3.4.1. In 3.4.0 a leased start threw `Webcam canvas does not provide a 2D
-context` and recognition never began, because the upstream camera helper builds its readback canvas
-in the same branch that opens the device — the branch a supplied element skips. Use 3.4.1 wherever
-Camera Source is loaded; 3.4.0 is unaffected only when it is not.
+Confidence scaling switches independently for joint opacity, joint radius, bone opacity, and bone
+width. A joint property is multiplied by that keypoint's confidence; a bone property by the lower
+confidence of its two endpoints. A bone is hidden when either endpoint falls below the minimum
+confidence. None of this changes the classifier input.
 
-## Camera preview and what the model sees
-
-The preview on the stage is the camera's own video element, at the camera's resolution and aspect
-ratio. It used to be a 320×240 readback canvas scaled to fit, so a 1080p camera looked like a
-320×240 one and a 16:9 camera was shown in a 4:3 window.
-
-The model is fed a square centre crop of the frame, mirrored, as a tensor. `fromPixels` uploads
-the video to a texture on the WebGL and WebGPU backends and the crop and mirroring are tensor ops,
-so no Canvas2D stage sits between the camera and the model. The square also makes PoseNet's
-padding zero, where the old 4:3 canvas was padded back to square and left the subject about 25%
-smaller than the frames the model was trained on. The crop is the whole square now: the readback
-canvas held only its top 240 rows and discarded the rest.
-
-The pose overlay spans the preview and its keypoints are in the camera frame's own coordinates.
-
-The extension performs pose, image, or audio classification in the browser and does not upload
-camera frames or microphone audio. It does fetch its runtime libraries and the published model. Stop
-recognition and the camera when the project no longer needs them.
-
-## Optional SVG pose overlay
-
-The `poseOverlay` feature flag is **on by default** for the standalone TurboWarp extension, adding
-blocks for overlay visibility, per-joint circle color/opacity/radius, shared bone
-color/opacity/width, minimum keypoint confidence, and confidence scaling. The overlay's SVG coordinate system is the
-camera frame's own, so it follows a camera of any resolution or aspect ratio, and it honours all
-six preview positions and preview mirroring. The Composition API enables this isolated overlay layer directly.
-
-Confidence scaling can be switched independently for joint opacity, joint radius, bone opacity,
-and bone width. Joint properties use the corresponding keypoint confidence; bone properties use
-the smaller confidence of the connected endpoints. This makes every enabled property vary from
-zero through its configured value without changing the recognition classifier input.
+Hiding the overlay does not stop recognition. Hiding the preview also hides the overlay; stopping
+recognition clears every mark; stopping the camera removes the SVG element.
 
 ## Accumulated pose scoring
 
-Live confidence flickers frame to frame near a decision boundary. The accumulated score blocks are
-the built-in answer: they combine evidence over time for poses that should be held steadily, so a
-brief misrecognition cannot flip a decision on its own. The `temporalPoseScoring` feature flag is
-**on by default**, so these blocks are in the palette.
+Live confidence flickers frame to frame near a decision boundary. Accumulated scores combine
+evidence over time, so a brief misrecognition cannot flip a decision on its own. The
+`temporalPoseScoring` feature flag is **on by default**.
 
 ```text
-previous × decay^elapsedSeconds + probability × accumulation × elapsedSeconds
+nextScore = previousScore × decayPerSecond^elapsedSeconds
+          + confidence × accumulationPerSecond × elapsedSeconds
 ```
 
-The accumulation coefficient is a per-second rate. The decay coefficient is the fraction retained
-after one second and is clamped to `0`–`1`; changes to decay take effect the next time recognition
-starts. Accumulation and decay both pause while the document is hidden.
+Scores use elapsed wall-clock seconds, not recognition counts. The accumulation coefficient is a
+per-second rate of zero or more. The decay coefficient is the fraction retained after one second,
+clamped to `0`–`1`; a changed decay takes effect the next time recognition starts. Both pause while
+the document is hidden.
 
 `accumulated pose` returns the highest positive accumulated pose only when it meets the configured
-threshold, or an empty string otherwise. The accumulated score reporters continue to return their
-unrounded values below that threshold. Resetting or stopping recognition clears all accumulated
-scores.
+threshold, and an empty string otherwise; the score reporters keep returning their unrounded values
+below it. Resetting or stopping recognition clears every accumulated score.
 
-### Accumulated pose change events
+This chooses one candidate. A consumer that waits for several pose steps in sequence should read
+`confidence of [NAME]` and own its own per-step progress rather than resetting this shared
+candidate-selection state.
+
+### Change events
 
 The `accumulatedPoseEvents` feature flag is **off by default** and requires `temporalPoseScoring`.
-When both are enabled, other unsandboxed extensions can check
+With both enabled, other unsandboxed extensions can check
 `runtime.ext_kubohiroyatm.supportsAccumulatedPoseEvents()` and subscribe to
 `TM_ACCUMULATED_POSE_CHANGED` on the TurboWarp runtime.
 
-Each version 2 event includes `poseName`, `previousPoseName`, `score`, `reason` (`recognition`,
-`reset`, or `stop`), and a monotonic `timestamp`. Score-only updates do not emit an event.
+A version 2 event carries `poseName`, `previousPoseName`, `score`, `reason` (`recognition`, `reset`,
+or `stop`), and a monotonic `timestamp`. An event is published only when the selected name changes,
+including the transition to an empty name on reset or stop; score-only updates publish nothing.
+
+## Host application APIs
+
+These two entry points are for applications that embed the runtime. A project built in the TurboWarp
+editor needs neither.
+
+### Composition API
+
+`@kubohiroya/turbowarp-teachable-machine/composition` gives a composite runtime the recognition
+engine without registering the standalone extension or adding blocks. The caller supplies an
+already-bundled Teachable Machine Pose runtime and validated model bytes, so this path downloads no
+runtime script and no model file.
+
+```js
+import {createTMComposition} from '@kubohiroya/turbowarp-teachable-machine/composition';
+
+const pose = createTMComposition({
+  runtime: bundledTMRuntime,
+  compute: tmCompute,                     // published by dist/runtime.js
+  modelInitializationPolicy: 'latest-needed',
+});
+
+const cameras = await pose.listCameraDevices();
+if (cameras[0]) await pose.selectCamera({deviceId: cameras[0].deviceId});
+
+await pose.registerPoseModel({
+  name: 'RescuePose',
+  files: [
+    {path: 'model.json', bytes: modelBytes},
+    {path: 'weights.bin', bytes: weightsBytes},
+    {path: 'metadata.json', bytes: metadataBytes},
+  ],
+});
+pose.activatePoseModel('RescuePose');
+
+pose.setPreviewPosition('full-stage');
+pose.setPoseBoneStyle({color: '#00e5ff', opacity: 0.9, width: 3});
+pose.configureAccumulatedPose({accumulationPerSecond: 1, decayPerSecond: 0.9, scoreThreshold: 0});
+const unsubscribe = pose.subscribeAccumulatedPose((event) => {
+  // event.poseName is the currently selected candidate, or an empty string.
+});
+
+await pose.startRecognition();
+```
+
+**Lifecycle.** Each composition owns its model registry, active model, camera, and recognition
+state. `releasePoseModel(name)` stops recognition when that model is active and disposes only it;
+`releaseAll()` releases the whole instance, cancels queued and active registration work, removes
+accumulated-pose listeners, and waits for safe cleanup. `subscribeAccumulatedPose()` returns an
+idempotent unsubscribe. Camera capture is an independent lifecycle: only `stopCamera()` and
+`releaseAll()` stop the stream. `File` objects live only for the pending `loadFromFiles()` call and
+are never stored in the registry.
+
+**Model initialization policy.** The default `legacy` policy keeps every registration independent.
+`latest-needed` suits a host with one current label-model demand, such as a story that can skip
+scenes: at most one heavy load is active and one newest request pending, and a newer request
+cancels the active one cooperatively and replaces an older request that has not started. For A
+loading, B pending, then C requested, B never reaches the TensorFlow loader. Repeated registrations
+with the same name, byte-identical files, and the same `AbortSignal` share one pending operation;
+different signals stay separate, so cancelling one caller cannot cancel another's work.
+
+Pass an `AbortSignal` to `registerPoseModel()` when the host no longer needs that demand. A queued
+request rejects with `AbortError` without invoking the runtime. TensorFlow.js 4.22.0 and Web Crypto
+cannot physically cancel every operation already running, so a running request becomes stale at
+once, starts no later phase, and disposes every late classifier and PoseNet result exactly once
+before its promise settles. A cancelled model is never published in the registry; shared PoseNet
+verification may finish and stay cached. Cancellation never stops the camera.
+
+Phases run sequentially by default, with cancellation checked after TensorFlow readiness,
+classifier loading, metadata parsing, and PoseNet loading. Set `parallelModelInitialization: true`
+only when startup latency matters more than those boundaries; it starts the three in parallel, and
+completed stale resources are still disposed before cancellation settles.
+
+The composition does not infer scene reachability. A host should retain the signal when the model is
+needed by an imminent action, abort it when a skipped path has no nearby demand, and submit the
+replacement model when a skip changes that demand.
+
+**Cameras.** `listCameraDevices()` enumerates afresh on every call and returns a deeply frozen copy
+holding only unique, non-empty video device IDs in enumeration order; labels stay empty until
+permission makes them available. Enumeration failures use `TM-COMPOSITION-012` and never expose
+`MediaDeviceInfo`, `MediaStreamTrack`, or a stream. Select `default`, `front`, or `back` as a
+preference, or wrap a session-only browser ID as `{deviceId}` — the object form is deliberately
+distinct, so a device whose ID is literally `default` is not mistaken for the preference. Selections
+run in call order; a failed switch restores the preceding camera; invalid selections use
+`TM-COMPOSITION-011`. Device IDs are never persisted, and all four camera methods fail closed after
+release.
+
+**Preview and overlay.** `setPreviewOpacity()` takes `0`–`1`; `setPreviewPosition()` takes
+`top-left`, `top-right`, `bottom-left`, `bottom-right`, `center`, or `full-stage`;
+`setPreviewMirroring()` takes `mirrored` (the default) or `unmirrored` and may be called before,
+during, or after camera startup. `showPreview()` and `hidePreview()` change visibility only. The
+overlay is enabled directly, with `showPoseOverlay()`, `hidePoseOverlay()`,
+`isPoseOverlayVisible()`, `setPoseJointStyle()`, `setPoseBoneStyle()`,
+`setPoseOverlayMinimumConfidence()`, and `setPoseOverlayConfidenceScaling()`.
+
+**Compute.** `selectComputeBackend('webgpu')` resolves to `{backend, fallback}`, where `fallback`
+is `true` when the requested backend was unusable. It is rejected with `TM-COMPOSITION-018` while
+pose models are registered, because their tensors live in the memory of the backend that loaded
+them — release them first.
+
+**Disposal shape.** Teachable Machine Pose 0.8.6 exposes the classifier as `CustomPoseNet.model`
+and PoseNet as `CustomPoseNet.posenetModel`, while its top-level `dispose()` releases PoseNet only.
+The composition therefore disconnects an active model from recognition first and disposes those two
+public resources separately and exactly once, rather than calling the incomplete top-level
+disposer. A custom injected runtime without those fields keeps the legacy single-`dispose()`
+contract; a runtime exposing only part of the official shape is rejected with `TM-COMPOSITION-009`
+after every safely identifiable resource has been attempted.
+
+**Canvas note.** The extension owns the camera canvas used by Teachable Machine and TensorFlow.js
+and requests a normal Canvas2D context for it. Physical-camera measurements of its 320×240,
+one-draw/one-read path showed no repeatable benefit from `willReadFrequently`, and that hint can
+make video drawing more expensive, so Chrome may emit its Canvas2D readback warning during CPU
+inference. Reconsider the hint only with a reproducible benchmark of this exact path.
+
+### Offline PoseNet bundle API
+
+`@kubohiroya/turbowarp-teachable-machine/posenet` owns the fixed PoseNet MobileNetV1 0.75 /
+stride 16 manifest, the package asset specifiers, SHA-256 verification, a bounded Base64 project
+descriptor, and the Teachable Machine Pose fetch adapter. A host application only decides where
+that explicit descriptor is stored. The model stays one JSON file and two binary shards; it is
+never disguised as an image, sound, or costume.
+
+```js
+import {readFile} from 'node:fs/promises';
+import {
+  createBundledTMRuntime,
+  createPoseNetProjectBundleFromLoader,
+} from '@kubohiroya/turbowarp-teachable-machine/posenet';
+
+const projectBundle = await createPoseNetProjectBundleFromLoader((file) =>
+  readFile(new URL(import.meta.resolve(file.packageSpecifier))),
+);
+
+// A browser host can store projectBundle in its own project-data channel.
+// Decoding and hash verification start on the first loadFromFiles() call.
+const offlineRuntime = createBundledTMRuntime({runtime: tmPose, projectBundle});
+```
+
+The model supply is exactly 5,082,500 bytes. Its three SHA-256 operations run independently, and the
+first shared verification overlaps the classifier load. The intercepted PoseNet fetch exposes no
+bytes until verification succeeds, and later requests reuse the same verified supply. Tampering,
+missing or wrongly sized files, and unexpected PoseNet network requests all fail closed with
+`TM-POSENET-*` error codes.
 
 ## Troubleshooting
 
-Read `last error` first when setup fails. Common causes are denied camera permission, a model editor
-URL instead of the published model folder URL, blocked network requests, or loading the extension in
-the sandbox. A sandboxed load shows nothing in the editor: the custom extension dialog simply keeps
-waiting, and only the browser console carries `TM must run without the extension sandbox.` Load the
-downloaded file from the dialog's **Files** tab, never from its **URL** tab.
+Read `last error` first. The usual causes are denied camera permission, a model *editor* URL instead
+of the published model folder URL, blocked network requests, and a sandboxed load.
+
+A sandboxed load shows nothing in the editor: the custom extension dialog simply keeps waiting, and
+only the browser console carries `TM must run without the extension sandbox.` Load the downloaded
+file from the dialog's **Files** tab, never from its **URL** tab.
 
 `start camera` also needs the page to have been interacted with at least once. Browsers refuse
-`video.play()` on a page with no user activation, which surfaces as `NotAllowedError: play() failed
-because the user didn't interact with the document first.` Clicking the green flag counts, so an
-ordinary project is fine; a packaged project that starts recognition on its own has to wait for a
-button press before `start camera`. See the illustrated guide's [troubleshooting section](https://kubohiroya.github.io/turbowarp-teachable-machine/#troubleshooting)
-or [Japanese troubleshooting section](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/#troubleshooting)
-for step-by-step checks.
+`video.play()` without user activation, which surfaces as `NotAllowedError: play() failed because
+the user didn't interact with the document first.` Clicking the green flag counts, so an ordinary
+project is fine; a packaged project that starts recognition on its own has to wait for a button
+press first.
+
+The guide has step-by-step checks:
+[English](https://kubohiroya.github.io/turbowarp-teachable-machine/#troubleshooting) ·
+[日本語](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/#troubleshooting).
+
+## Version notes
+
+### Upgrading from 2.x
+
+The block surface, the composition API, and the offline PoseNet bundle API are unchanged; a project
+built on 2.x keeps working after swapping the extension file. Nine blocks are new — three for
+compute backends, six for accumulated pose scoring. What changed is the bundled runtime:
+
+| | 2.x | 3.0.0 |
+|---|---|---|
+| TensorFlow.js | 1.3.1 | 4.22.0 |
+| Teachable Machine Pose | 0.8.3 | 0.8.6 |
+| TensorFlow.js Speech Commands | 0.4.0 | 0.5.4 |
+| Compute backends | WebGL only | WebGPU, WebGL, WASM, CPU, negotiated at load |
+
+That runtime is published as `globalThis.tf`, so a host application reading it directly moves from
+the TensorFlow.js 1.x API to 4.x — the reason this is a major release. Models exported by Teachable
+Machine are unaffected: pose, image, and audio models exported for the 1.x-era libraries load and
+run unchanged on 4.22.0.
+
+Two behavioural notes for existing projects:
+
+- Without a `set compute mode to` block, recognition now negotiates a backend instead of always
+  using WebGL. `active compute backend` reports which one won.
+- The first `start camera` or `load model` downloads a larger runtime than 2.x did (1.24 MB against
+  1.04 MB), so plan the startup sequence accordingly.
+
+### 3.4.1 — camera leasing
+
+In 3.4.0 a leased start threw `Webcam canvas does not provide a 2D context` and recognition never
+began, because the upstream camera helper builds its readback canvas in the same branch that opens
+the device — the branch a supplied element skips. Use 3.4.1 or later wherever Camera Source is
+loaded; 3.4.0 is unaffected only when it is not.
+
+### 3.5.0 — preview and crop
+
+The preview became the camera's own video rather than a 320×240 readback canvas scaled to fit, so it
+carries the camera's resolution and aspect ratio. The model is fed the whole square centre crop as a
+tensor; the canvas used to hold only its top 240 rows, so a quarter of the subject's height never
+reached the model, and the 4:3 canvas was padded back to square, leaving the subject about 25%
+smaller than the frames the model was trained on. Blocks, opcodes, and the composition API are
+unchanged — but a pose model now sees a subject it was not seeing before, which is the point.
+
+### 3.5.1 — image-mode mirroring
+
+Image mode handed `predict` the camera's video element without asking for mirroring, so the model
+saw unmirrored pixels while Teachable Machine had trained it on a CSS-mirrored preview. The square
+it sees was already the frame's centre crop; only the mirroring was missing. Pose and image mode now
+feed the same square the same way round. Pose recognition is unchanged.
 
 ## Blocks
 
@@ -1040,41 +947,44 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-The check runs type checking, tests, the production build, generated-documentation validation,
+`pnpm check` runs type checking, tests, the production build, generated-documentation validation,
 Pages link validation, distribution reproducibility, and an npm package dry run. The build produces
-`dist/tm.js`, `dist/composition.js`, `dist/runtime.js`, `dist/posenet.js`, and the three raw
-PoseNet model assets under `dist/posenet/`.
+`dist/tm.js`, `dist/composition.js`, `dist/runtime.js`, `dist/posenet.js`, and the three raw PoseNet
+model assets under `dist/posenet/`.
 
-The version in `package.json` is the release source of truth. The runtime reporter appends
-`-typescript` to that version, and the release consistency check keeps the generated bundles,
-exact-version README examples, Pages badges, and release tag aligned with it.
+The block reference above is generated from `src/block-definitions.json` by `pnpm docs`; edit the
+definitions, not the generated section. The version in `package.json` is the release source of
+truth: the runtime reporter appends `-typescript` to it, and the release consistency check keeps the
+generated bundles, the exact-version README examples, the Pages badges, and the release tag aligned
+with it.
 
 ### npm publishing
 
-npm publication uses GitHub Actions trusted publishing rather than a long-lived write token. The
-npm package settings must trust `kubohiroya/turbowarp-teachable-machine`, workflow file
-`publish-npm.yml`, for `npm publish`. After the annotated release tag and GitHub Release exist,
-dispatch **Publish npm package** with that tag. The workflow checks out the tag, verifies that it
-exactly matches `package.json`, runs the complete check, and publishes through a short-lived OIDC
-credential. Roll back the automation by removing the trusted publisher in npm package settings;
-do not add a write token to the repository.
+npm publication uses GitHub Actions trusted publishing rather than a long-lived write token. The npm
+package settings must trust `kubohiroya/turbowarp-teachable-machine`, workflow file
+`publish-npm.yml`, for `npm publish`. Once the annotated release tag and the GitHub Release exist,
+dispatch **Publish npm package** with that tag: the workflow checks out the tag, verifies that it
+matches `package.json` exactly, runs the complete check, and publishes through a short-lived OIDC
+credential. Roll the automation back by removing the trusted publisher in npm package settings; do
+not add a write token to the repository.
 
 ## External libraries
 
 The version-pinned `dist/runtime.js` artifact bundles TensorFlow.js 4.22.0, Teachable Machine Pose
-0.8.6, Teachable Machine Image 0.8.5, TensorFlow.js Speech Commands 0.5.4, and its PoseNet 2.2.2
-runtime in one reviewed module graph. The standalone extension loads that single artifact from
-jsDelivr when no runtime is injected. The optional `dist/backend-wasm.js` and
-`dist/backend-webgpu.js` bundles resolve TensorFlow.js against the instance that runtime already
-published, so a page never ends up with two TensorFlow.js cores; the WebAssembly binaries under
-`dist/wasm/` and the fixed offline PoseNet model data under `dist/posenet/` are distributed as their
-original binary files.
+0.8.6, Teachable Machine Image 0.8.5, TensorFlow.js Speech Commands 0.5.4, and PoseNet 2.2.2 in one
+reviewed module graph. The standalone extension loads that single artifact from jsDelivr when no
+runtime is injected. The optional `dist/backend-wasm.js` and `dist/backend-webgpu.js` bundles
+resolve TensorFlow.js against the instance that runtime already published, so a page never ends up
+with two TensorFlow.js cores. The WebAssembly binaries under `dist/wasm/` and the fixed offline
+PoseNet model data under `dist/posenet/` are distributed as their original binary files.
+
+Third-party licences are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Fixed input editors
+
+The opt-in fixed input forms, and the rules that keep existing data intact, are described in
+[the fixed input editor contract](docs/fixed-input-editors.ja.md) (Japanese).
 
 ## License
 
 MPL-2.0
-
-
-## 固定入力の編集
-
-既定OFFの固定入力フォームと既存データの保持規則は[固定入力エディターの契約](docs/fixed-input-editors.ja.md)を参照してください。

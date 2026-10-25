@@ -401,5 +401,9 @@
     </div>
   </footer>
 <section id="fixed-input-editors"><h2>固定入力の編集</h2><p>recognition/compute/preview/poseの固定選択と数値だけを対象とし、モデルload、カメラ、デバイス列挙、GPU利用可否の探索は行わない。POSITIONの日本語alias、recognition/mirroring/compute/on-offの既知aliasは表示投影のみ。PoseNet PARTはcamelCaseを維持しMotion Captureのsnake_caseと統合しない。finiteな新数値には既存runtimeのclamp/floorをそのまま残し、保存rawをclampしない。poseOverlay/temporalPoseScoringで実getInfoから消えたopcodeの登録を除去し、現れるopcodeだけ再登録する。元のownerフラグ既定値は変更しない。</p><ul></ul><p><a href="../fixed-input-editors.ja.md">固定入力の契約・保持規則・切戻し</a></p></section>
+<!-- The shared TurboWarp Plus header. It inserts itself at the top of the
+     page in a shadow root, so it cannot disturb the styles below. -->
+<script type="module"
+        src="https://kubohiroya.github.io/turbowarp-plus-site-header/dist/auto.js"></script>
 </body>
 </html>

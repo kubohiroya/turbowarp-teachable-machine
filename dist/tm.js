@@ -1,5 +1,5 @@
 // Name: Teachable Machine
-// ID: kubohiroyatm
+// ID: kubohiroyateachablemachine
 // Description: Use Teachable Machine pose, image, or audio models for recognition in TurboWarp.
 // By: Hiroya Kubo
 // License: MPL-2.0
@@ -378,9 +378,9 @@
   var fixedInputEditors = [
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setRecognitionMode",
-      opcodes: ["kubohiroyatm_setRecognitionMode"],
+      opcodes: ["kubohiroyateachablemachine_setRecognitionMode"],
       contractId: "turbowarp-teachable-machine/setRecognitionMode",
       contractRevision: "1",
       validationContext: () => ({
@@ -396,9 +396,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setComputeMode",
-      opcodes: ["kubohiroyatm_setComputeMode"],
+      opcodes: ["kubohiroyateachablemachine_setComputeMode"],
       contractId: "turbowarp-teachable-machine/setComputeMode",
       contractRevision: "1",
       validationContext: () => ({
@@ -416,9 +416,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPreviewOpacity",
-      opcodes: ["kubohiroyatm_setPreviewOpacity"],
+      opcodes: ["kubohiroyateachablemachine_setPreviewOpacity"],
       contractId: "turbowarp-teachable-machine/setPreviewOpacity",
       contractRevision: "1",
       validationContext: () => ({
@@ -430,9 +430,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPreviewPosition",
-      opcodes: ["kubohiroyatm_setPreviewPosition"],
+      opcodes: ["kubohiroyateachablemachine_setPreviewPosition"],
       contractId: "turbowarp-teachable-machine/setPreviewPosition",
       contractRevision: "1",
       validationContext: () => ({
@@ -451,9 +451,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPreviewMirroring",
-      opcodes: ["kubohiroyatm_setPreviewMirroring"],
+      opcodes: ["kubohiroyateachablemachine_setPreviewMirroring"],
       contractId: "turbowarp-teachable-machine/setPreviewMirroring",
       contractRevision: "1",
       validationContext: () => ({
@@ -465,9 +465,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPoseOverlayVisibility",
-      opcodes: ["kubohiroyatm_setPoseOverlayVisibility"],
+      opcodes: ["kubohiroyateachablemachine_setPoseOverlayVisibility"],
       contractId: "turbowarp-teachable-machine/setPoseOverlayVisibility",
       contractRevision: "1",
       validationContext: () => ({
@@ -479,9 +479,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPoseJointStyle",
-      opcodes: ["kubohiroyatm_setPoseJointStyle"],
+      opcodes: ["kubohiroyateachablemachine_setPoseJointStyle"],
       contractId: "turbowarp-teachable-machine/setPoseJointStyle",
       contractRevision: "1",
       validationContext: () => ({
@@ -515,9 +515,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPoseBoneStyle",
-      opcodes: ["kubohiroyatm_setPoseBoneStyle"],
+      opcodes: ["kubohiroyateachablemachine_setPoseBoneStyle"],
       contractId: "turbowarp-teachable-machine/setPoseBoneStyle",
       contractRevision: "1",
       validationContext: () => ({
@@ -529,9 +529,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPoseOverlayMinimumConfidence",
-      opcodes: ["kubohiroyatm_setPoseOverlayMinimumConfidence"],
+      opcodes: ["kubohiroyateachablemachine_setPoseOverlayMinimumConfidence"],
       contractId: "turbowarp-teachable-machine/setPoseOverlayMinimumConfidence",
       contractRevision: "1",
       validationContext: () => ({
@@ -543,9 +543,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setPoseConfidenceScaling",
-      opcodes: ["kubohiroyatm_setPoseConfidenceScaling"],
+      opcodes: ["kubohiroyateachablemachine_setPoseConfidenceScaling"],
       contractId: "turbowarp-teachable-machine/setPoseConfidenceScaling",
       contractRevision: "1",
       validationContext: () => ({
@@ -562,9 +562,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setAccumulatedPoseParameters",
-      opcodes: ["kubohiroyatm_setAccumulatedPoseParameters"],
+      opcodes: ["kubohiroyateachablemachine_setAccumulatedPoseParameters"],
       contractId: "turbowarp-teachable-machine/setAccumulatedPoseParameters",
       contractRevision: "1",
       validationContext: () => ({
@@ -576,9 +576,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-setAccumulatedPoseThreshold",
-      opcodes: ["kubohiroyatm_setAccumulatedPoseThreshold"],
+      opcodes: ["kubohiroyateachablemachine_setAccumulatedPoseThreshold"],
       contractId: "turbowarp-teachable-machine/setAccumulatedPoseThreshold",
       contractRevision: "1",
       validationContext: () => ({
@@ -590,9 +590,9 @@
     },
     {
       apiVersion: 1,
-      extensionId: "kubohiroyatm",
+      extensionId: "kubohiroyateachablemachine",
       editorId: "fixed-isPoseWithThreshold",
-      opcodes: ["kubohiroyatm_isPoseWithThreshold"],
+      opcodes: ["kubohiroyateachablemachine_isPoseWithThreshold"],
       contractId: "turbowarp-teachable-machine/isPoseWithThreshold",
       contractRevision: "1",
       validationContext: () => ({
@@ -1228,7 +1228,7 @@
   }
   var package_default = {
     name: "@kubohiroya/turbowarp-teachable-machine",
-    version: "3.5.6",
+    version: "4.0.0",
     description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
     author: "Hiroya Kubo <hiroya@cuc.ac.jp>",
     license: "MPL-2.0",
@@ -1344,7 +1344,7 @@
     const { acquireCamera } = candidate;
     return typeof acquireCamera === "function" ? candidate : void 0;
   }
-  var EXTENSION_ID = "kubohiroyatm";
+  var EXTENSION_ID = "kubohiroyateachablemachine";
   var VERSION = `${package_default.version}-typescript`;
   var DOCS_URI = "https://kubohiroya.github.io/turbowarp-teachable-machine/";
   var ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANGED";
@@ -1582,7 +1582,7 @@
     const active = loadingPromises.get(src);
     if (active) return active;
     const existing = Array.from(document.scripts).find((script) => script.src === src);
-    if (existing?.dataset.kubohiroyatmLoaded === "true") return Promise.resolve();
+    if (existing?.dataset.kubohiroyateachablemachineLoaded === "true") return Promise.resolve();
     const promise = new Promise((resolve, reject) => {
       const script = existing ?? document.createElement("script");
       const cleanup = () => {
@@ -1591,7 +1591,7 @@
       };
       const handleLoad = () => {
         cleanup();
-        script.dataset.kubohiroyatmLoaded = "true";
+        script.dataset.kubohiroyateachablemachineLoaded = "true";
         resolve();
       };
       const handleError = () => {
@@ -2867,7 +2867,7 @@
   if (!Scratch.extensions.unsandboxed) throw new Error("TM must run without the extension sandbox. In TurboWarp's custom extension dialog, load the downloaded tm.js from the Files tab with \"Run without sandbox\" enabled; a URL pasted into the URL tab is always sandboxed.");
   var extension = new TMExtension();
   Scratch.extensions.register(extension);
-  if (Scratch.vm?.runtime) Scratch.vm.runtime.ext_kubohiroyatm = extension;
+  if (Scratch.vm?.runtime) Scratch.vm.runtime.ext_kubohiroyateachablemachine = extension;
   //#endregion
 
 })(Scratch);

@@ -1,5 +1,5 @@
 export const extensionConfig = {
-  id: 'kubohiroyatm',
+  id: 'kubohiroyateachablemachine',
   slug: 'tm',
   name: 'Teachable Machine',
   description: 'Use Teachable Machine pose, image, or audio models for recognition in TurboWarp.',

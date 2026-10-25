@@ -10,7 +10,7 @@ interface ScratchApi {
   vm?: {
     runtime?: {
       emit(eventName: string, payload: unknown): void;
-      ext_kubohiroyatm?: {
+      ext_kubohiroyateachablemachine?: {
         supportsAccumulatedPoseEvents(): boolean;
       };
     };

@@ -13,5 +13,5 @@ if (!Scratch.extensions.unsandboxed) {
 const extension = new TMExtension();
 Scratch.extensions.register(extension);
 if (Scratch.vm?.runtime) {
-  Scratch.vm.runtime.ext_kubohiroyatm = extension;
+  Scratch.vm.runtime.ext_kubohiroyateachablemachine = extension;
 }

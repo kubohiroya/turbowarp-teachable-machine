@@ -1,7 +1,7 @@
 import { type ComputeBackendSelection, type ComputeMode } from './compute-backend.js';
 import { type FeatureFlags } from './config/feature-flags.js';
 import { type PoseOverlayConfidenceProperty } from './pose-overlay.js';
-export declare const EXTENSION_ID = "kubohiroyatm";
+export declare const EXTENSION_ID = "kubohiroyateachablemachine";
 export declare const VERSION: string;
 export declare const DOCS_URI = "https://kubohiroya.github.io/turbowarp-teachable-machine/";
 export declare const ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANGED";

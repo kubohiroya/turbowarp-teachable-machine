@@ -115,7 +115,7 @@ describe('Teachable Machine fixed-only runtime contract', () => {
       const remove = vi.fn();const register = vi.fn(() => remove);
       Object.assign(Scratch, {gui: {blockEditors: {apiVersion: 1, registerFixedInputEditor: register}}});
       expect(extension.getInfo()).toEqual(expected);extension.getInfo();
-      const opcodes = new Set(expected.blocks.map((b: {opcode: string}) => `kubohiroyatm_${b.opcode}`));
+      const opcodes = new Set(expected.blocks.map((b: {opcode: string}) => `kubohiroyateachablemachine_${b.opcode}`));
       expect(register.mock.calls.map(c => (c[0] as unknown as FixedInputEditorOptions).opcodes[0])).toEqual(fixedInputEditors.filter(o => opcodes.has(o.opcodes[0])).map(o => o.opcodes[0]));
       extension.featureFlags.poseOverlay = !poseOverlay;extension.getInfo();expect(remove).toHaveBeenCalled();
       Reflect.deleteProperty(Scratch, 'gui');

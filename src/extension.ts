@@ -45,7 +45,7 @@ function readCameraSource(runtime: unknown): CameraSourceRuntime | undefined {
   return typeof acquireCamera === 'function' ? (candidate as CameraSourceRuntime) : undefined;
 }
 
-export const EXTENSION_ID = 'kubohiroyatm';
+export const EXTENSION_ID = 'kubohiroyateachablemachine';
 export const VERSION = `${packageMetadata.version}-typescript`;
 export const DOCS_URI = 'https://kubohiroya.github.io/turbowarp-teachable-machine/';
 export const ACCUMULATED_POSE_CHANGED_EVENT = 'TM_ACCUMULATED_POSE_CHANGED';
@@ -316,7 +316,7 @@ export function loadScript(src: string): Promise<void> {
   if (active) return active;
 
   const existing = Array.from(document.scripts).find((script) => script.src === src);
-  if (existing?.dataset.kubohiroyatmLoaded === 'true') return Promise.resolve();
+  if (existing?.dataset.kubohiroyateachablemachineLoaded === 'true') return Promise.resolve();
 
   const promise = new Promise<void>((resolve, reject) => {
     const script = existing ?? document.createElement('script');
@@ -326,7 +326,7 @@ export function loadScript(src: string): Promise<void> {
     };
     const handleLoad = () => {
       cleanup();
-      script.dataset.kubohiroyatmLoaded = 'true';
+      script.dataset.kubohiroyateachablemachineLoaded = 'true';
       resolve();
     };
     const handleError = () => {

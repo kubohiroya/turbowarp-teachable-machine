@@ -146,7 +146,7 @@ describe('TMExtension', () => {
       blocks: Array<{opcode: string}>;
       menus: {cameraMenu: {items: string}};
     };
-    expect(info.id).toBe('kubohiroyatm');
+    expect(info.id).toBe('kubohiroyateachablemachine');
     expect(info.docsURI).toBe(DOCS_URI);
     expect(info.docsURI).toBe('https://kubohiroya.github.io/turbowarp-teachable-machine/');
     expect(info.blockIconURI).toBe(BLOCK_ICON_URI);
@@ -330,7 +330,7 @@ describe('TMExtension', () => {
     await import('../src/index.js');
 
     const registeredExtension = register.mock.calls[0]?.[0];
-    expect(runtime).toHaveProperty('ext_kubohiroyatm', registeredExtension);
+    expect(runtime).toHaveProperty('ext_kubohiroyateachablemachine', registeredExtension);
     expect(typeof registeredExtension.supportsAccumulatedPoseEvents).toBe('function');
   });
 

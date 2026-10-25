@@ -50,24 +50,32 @@ flowchart LR
 ダウンロード先、および合成ランタイムが取得する成果物は、jsDelivr上のバージョン固定ビルドです。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.6/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/tm.js
 ```
 
 合成ランタイムは、縮小済みの第三者バンドルを書き換えることなく、同じ検証済み成果物を読み込んだり同梱したりできます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.6/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/runtime.js
 ```
 
 公開済みパッケージを別のプロジェクトに追加するには次のようにします。
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.6
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.0
 ```
 
 ### 名前について
 
-Scratchの機能拡張IDは、2.x系以降`kubohiroyatm`です。短いIDどうしの衝突を避けるためで、パッケージ名・リポジトリ名・PagesのURL・ブラウザー向けビルドはいずれも`turbowarp-teachable-machine`を使います。
+Scratchの機能拡張IDは、4.x系以降`kubohiroyateachablemachine`です。この系統の他の機能拡張と同じく製品名を綴り切る形に揃えたもので、パッケージ名・リポジトリ名・PagesのURL・ブラウザー向けビルドはいずれも`turbowarp-teachable-machine`を使います。
+
+> **機能拡張IDは4.0.0で変わりました。** メジャー系統ごとに異なるIDを使っています。1.x系までは`tmpose`、2.x系と3.x系は`kubohiroyatm`、4.0.0以降は`kubohiroyateachablemachine`です。4.x系のビルドは新しいIDだけを登録し、古いIDを読み込めるようにするエイリアスは置きません。そのため、それ以前の系統で保存したプロジェクトは、変換するまでブロックが見つからない状態で開きます。展開したプロジェクトのソースは[`sb3-toolchain`](https://github.com/kubohiroya/sb3-toolchain)で変換してください。変更内容を先に報告し、`--yes`を付けたときだけ書き込みます。
+>
+> ```sh
+> sb3-toolchain extensions migrate-id SOURCE_DIR --from kubohiroyatm --to kubohiroyateachablemachine
+> ```
+>
+> 2.x系より前のプロジェクトでは`--from tmpose`を指定します。変換に失敗した場合は入力を変更しません。3.x系のリリースは切り戻し先として公開したままです。
 
 > パッケージ・リポジトリ・PagesのURLは、以前は`turbowarp-tm`（`@kubohiroya/turbowarp-tm`、最終公開は3.2.0）という名前でした。CDNのURL、`pnpm add`、`import`の指定子では`turbowarp-teachable-machine`に置き換えてください。
 
@@ -174,7 +182,7 @@ TensorFlow.jsは、テンソルを「作成時に有効だったバックエン�
 
 ### 変化イベント
 
-`accumulatedPoseEvents`フィーチャーフラグは**既定で無効**で、`temporalPoseScoring`が必要です。両方を有効にすると、他のサンドボックス外の機能拡張が`runtime.ext_kubohiroyatm.supportsAccumulatedPoseEvents()`で対応を確認し、TurboWarpランタイム上の`TM_ACCUMULATED_POSE_CHANGED`を購読できます。
+`accumulatedPoseEvents`フィーチャーフラグは**既定で無効**で、`temporalPoseScoring`が必要です。両方を有効にすると、他のサンドボックス外の機能拡張が`runtime.ext_kubohiroyateachablemachine.supportsAccumulatedPoseEvents()`で対応を確認し、TurboWarpランタイム上の`TM_ACCUMULATED_POSE_CHANGED`を購読できます。
 
 バージョン2のイベントは、`poseName`・`previousPoseName`・`score`・`reason`（`recognition`・`reset`・`stop`）と単調増加の`timestamp`を持ちます。イベントが出るのは選ばれた名前が変わったときだけで、リセットや停止で空の名前に移る場合も含みます。スコアだけの更新では何も出ません。
 

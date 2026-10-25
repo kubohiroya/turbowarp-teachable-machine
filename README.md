@@ -62,27 +62,41 @@ select that file, and keep **Run without sandbox** enabled.
 The download, and the artifact a composite runtime fetches, is the version-pinned build on jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.6/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/tm.js
 ```
 
 A composite runtime can load or embed the same reviewed artifact without rewriting a minified
 third-party bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.5.6/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.5.6
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.0
 ```
 
 ### Names
 
-The Scratch extension ID is `kubohiroyatm`, from the 2.x release line onward, so that it does not
-collide with other short IDs. The package, repository, Pages URL, and browser build all use
-`turbowarp-teachable-machine`.
+The Scratch extension ID is `kubohiroyateachablemachine`, from the 4.x release line onward,
+spelling the product name out the way the other extensions in this family do. The package,
+repository, Pages URL, and browser build all use `turbowarp-teachable-machine`.
+
+> **The extension ID changed in 4.0.0.** Each major line used a different ID: `tmpose` through 1.x,
+> `kubohiroyatm` in 2.x and 3.x, and `kubohiroyateachablemachine` from 4.0.0. A 4.x build registers
+> the new ID only — no alias keeps the earlier ones loadable — so a project saved against an
+> earlier line opens with missing blocks until it is converted. Convert the expanded project source
+> with [`sb3-toolchain`](https://github.com/kubohiroya/sb3-toolchain), which reports the planned
+> changes and writes them only when `--yes` is passed:
+>
+> ```sh
+> sb3-toolchain extensions migrate-id SOURCE_DIR --from kubohiroyatm --to kubohiroyateachablemachine
+> ```
+>
+> Pass `--from tmpose` for a project that predates 2.x. A failed conversion leaves the input
+> unchanged, and the 3.x releases stay published as a rollback target.
 
 > The package, repository, and Pages URL were previously named `turbowarp-tm`
 > (`@kubohiroya/turbowarp-tm`, last published as 3.2.0). Replace that name with
@@ -244,7 +258,7 @@ candidate-selection state.
 
 The `accumulatedPoseEvents` feature flag is **off by default** and requires `temporalPoseScoring`.
 With both enabled, other unsandboxed extensions can check
-`runtime.ext_kubohiroyatm.supportsAccumulatedPoseEvents()` and subscribe to
+`runtime.ext_kubohiroyateachablemachine.supportsAccumulatedPoseEvents()` and subscribe to
 `TM_ACCUMULATED_POSE_CHANGED` on the TurboWarp runtime.
 
 A version 2 event carries `poseName`, `previousPoseName`, `score`, `reason` (`recognition`, `reset`,

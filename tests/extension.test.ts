@@ -151,8 +151,8 @@ describe('TMExtension', () => {
     expect(info.docsURI).toBe('https://kubohiroya.github.io/turbowarp-teachable-machine/');
     expect(info.blockIconURI).toBe(BLOCK_ICON_URI);
     const iconSvg = decodeURIComponent(BLOCK_ICON_URI.slice('data:image/svg+xml,'.length));
-    expect(iconSvg).toContain('viewBox="0 0 64 64"');
-    expect(iconSvg).toContain('<circle cx="32" cy="18" r="5"/>');
+    expect(iconSvg).toContain('viewBox="0 0 48 48"');
+    expect(iconSvg).toContain('<circle cx="24" cy="15" r="4"');
     expect(iconSvg).not.toContain('<rect');
     expect(new TMExtension().versionReporter()).toBe(VERSION);
     expect(VERSION).toBe(`${packageMetadata.version}-typescript`);

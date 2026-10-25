@@ -1,5 +1,7 @@
 # TurboWarp Teachable Machine
 
+<img src="assets/block-icon.svg" alt="" width="48" height="48">
+
 Use a [Teachable Machine](https://teachablemachine.withgoogle.com/) pose, image, or audio model as
 an input for TurboWarp projects. The extension turns each camera frame or microphone window into labels,
 confidence scores, and Boolean conditions that Scratch-style scripts can use.

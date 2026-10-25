@@ -2,7 +2,7 @@
 
 <img src="assets/block-icon.svg" alt="" width="48" height="48">
 
-[English](README.md) | [日本語](README.ja.md)
+English | [日本語](README.ja.md)
 
 Use a published [Teachable Machine](https://teachablemachine.withgoogle.com/) pose, image, or audio
 model as an input for TurboWarp projects. Every camera frame or microphone window becomes a label, a

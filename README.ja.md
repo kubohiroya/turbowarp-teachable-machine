@@ -2,7 +2,7 @@
 
 <img src="assets/block-icon.svg" alt="" width="48" height="48">
 
-[English](README.md) | [日本語](README.ja.md)
+[English](README.md) | 日本語
 
 公開済みの[Teachable Machine](https://teachablemachine.withgoogle.com/)のポーズ・画像・音声モデルを、TurboWarpプロジェクトの入力として使うための機能拡張です。カメラの各フレームやマイクの各区間が、スクリプトからそのまま使えるラベル・信頼度・真偽条件になります。
 

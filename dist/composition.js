@@ -1218,6 +1218,7 @@ var package_default = {
 	files: [
 		"dist/",
 		"README.md",
+		"README.ja.md",
 		"LICENSE",
 		"THIRD_PARTY_NOTICES.md",
 		"schemas/",

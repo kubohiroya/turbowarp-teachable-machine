@@ -55,6 +55,8 @@ function element(tagName = 'DIV') {
     getBoundingClientRect: vi.fn(() => ({
       left: 0, top: 0, right: 480, bottom: 360, width: 480, height: 360
     })),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
     setAttribute(name: string, attributeValue: unknown) {
       attributes[name] = String(attributeValue);
     },
@@ -82,6 +84,12 @@ let registerExtension: ReturnType<typeof vi.fn>;
 let appendScript: ReturnType<typeof vi.fn>;
 let animationCallbacks: Array<() => void>;
 let enumerateDevices: ReturnType<typeof vi.fn>;
+let getUserMedia: ReturnType<typeof vi.fn>;
+
+/** One video track, wrapped the way a MediaStream presents it. */
+function asStream(track: unknown) {
+  return {getVideoTracks: () => [track], getTracks: () => [track]};
+}
 
 beforeEach(() => {
   registerExtension = vi.fn();
@@ -114,7 +122,8 @@ beforeEach(() => {
     animationCallbacks.push(callback);
     return animationCallbacks.length;
   }));
-  vi.stubGlobal('navigator', {mediaDevices: {enumerateDevices}});
+  getUserMedia = vi.fn(async () => asStream({kind: 'video', label: '', getSettings: () => ({}), stop: vi.fn()}));
+  vi.stubGlobal('navigator', {mediaDevices: {enumerateDevices, getUserMedia}});
 });
 
 afterEach(() => vi.unstubAllGlobals());
@@ -908,9 +917,10 @@ describe('TM composition API', () => {
       getSettings: () => ({deviceId: 'default'}),
       stop: stopTrack
     };
+    getUserMedia.mockResolvedValue(asStream(track));
     const webcam = {
       canvas,
-      webcam: {srcObject: {getVideoTracks: () => [track], getTracks: () => [track]}},
+      webcam: null,
       setup: vi.fn(async () => undefined),
       play: vi.fn(async () => undefined),
       update: vi.fn()
@@ -933,7 +943,7 @@ describe('TM composition API', () => {
     expect(composition.getActiveCamera()).toBeNull();
 
     await composition.startCamera();
-    expect(webcam.setup).toHaveBeenCalledWith({deviceId: {exact: 'default'}});
+    expect(getUserMedia).toHaveBeenCalledWith({video: {deviceId: {exact: 'default'}}});
     const activeCamera = composition.getActiveCamera();
     expect(activeCamera).toEqual({deviceId: 'default', label: 'Literal Default Camera'});
     expect(Object.isFrozen(activeCamera)).toBe(true);
@@ -943,20 +953,22 @@ describe('TM composition API', () => {
 
   it('switches cameras during recognition without changing model or preview mirroring', async () => {
     const stage = element();
-    const createWebcam = (deviceId: string, label: string, stop: ReturnType<typeof vi.fn>) => {
-      const track = {kind: 'video', label, getSettings: () => ({deviceId}), stop};
-      return {
-        canvas: element('CANVAS'),
-        webcam: {srcObject: {getVideoTracks: () => [track], getTracks: () => [track]}},
-        setup: vi.fn(async () => undefined),
-        play: vi.fn(async () => undefined),
-        update: vi.fn()
-      };
-    };
+    const createWebcam = () => ({
+      canvas: element('CANVAS'),
+      webcam: null,
+      setup: vi.fn(async () => undefined),
+      play: vi.fn(async () => undefined),
+      update: vi.fn()
+    });
     const firstStop = vi.fn();
     const secondStop = vi.fn();
-    const firstWebcam = createWebcam('first-id', 'First Camera', firstStop);
-    const secondWebcam = createWebcam('second-id', 'Second Camera', secondStop);
+    const streams = [
+      asStream({kind: 'video', label: 'First Camera', getSettings: () => ({deviceId: 'first-id'}), stop: firstStop}),
+      asStream({kind: 'video', label: 'Second Camera', getSettings: () => ({deviceId: 'second-id'}), stop: secondStop})
+    ];
+    getUserMedia.mockImplementation(async () => streams.shift());
+    const firstWebcam = createWebcam();
+    const secondWebcam = createWebcam();
     const webcams = [firstWebcam, secondWebcam];
     const Webcam = vi.fn(function () {
       return webcams.shift();
@@ -979,7 +991,7 @@ describe('TM composition API', () => {
     await composition.selectCamera({deviceId: 'second-id'});
 
     expect(firstStop).toHaveBeenCalledOnce();
-    expect(secondWebcam.setup).toHaveBeenCalledWith({deviceId: {exact: 'second-id'}});
+    expect(getUserMedia).toHaveBeenLastCalledWith({video: {deviceId: {exact: 'second-id'}}});
     expect(secondWebcam.canvas.style.transform).toBe('scaleX(-1)');
     expect(composition.isRecognizing()).toBe(true);
     expect(composition.getActivePoseModelName()).toBe('Active');
@@ -994,30 +1006,23 @@ describe('TM composition API', () => {
   it('serializes camera selections and keeps the latest successful state after rollback', async () => {
     const stage = element();
     const pendingSetup = deferred<void>();
-    const createWebcam = (
-      deviceId: string,
-      setup: () => Promise<void> = async () => undefined
-    ) => {
-      const track = {
-        kind: 'video',
-        label: deviceId,
-        getSettings: () => ({deviceId}),
-        stop: vi.fn()
-      };
-      return {
-        canvas: element('CANVAS'),
-        webcam: {srcObject: {getVideoTracks: () => [track], getTracks: () => [track]}},
-        setup: vi.fn(setup),
-        play: vi.fn(async () => undefined),
-        update: vi.fn()
-      };
-    };
-    const initial = createWebcam('initial-id');
-    const selected = createWebcam('selected-id', () => pendingSetup.promise);
-    const failed = createWebcam('failed-id', async () => {
-      throw new Error('camera unavailable');
+    const createWebcam = (setup: () => Promise<void> = async () => undefined) => ({
+      canvas: element('CANVAS'),
+      webcam: null,
+      setup: vi.fn(setup),
+      play: vi.fn(async () => undefined),
+      update: vi.fn()
     });
-    const rollback = createWebcam('selected-id');
+    // The camera is opened before setup() now, so that is where an unavailable one fails.
+    getUserMedia.mockImplementation(async (request: {video?: {deviceId?: {exact: string}}}) => {
+      const deviceId = request.video?.deviceId?.exact ?? 'initial-id';
+      if (deviceId === 'missing-id') throw new Error('camera unavailable');
+      return asStream({kind: 'video', label: deviceId, getSettings: () => ({deviceId}), stop: vi.fn()});
+    });
+    const initial = createWebcam();
+    const selected = createWebcam(() => pendingSetup.promise);
+    const failed = createWebcam();
+    const rollback = createWebcam();
     const webcams = [initial, selected, failed, rollback];
     const Webcam = vi.fn(function () {
       return webcams.shift();
@@ -1038,8 +1043,11 @@ describe('TM composition API', () => {
     pendingSetup.resolve(undefined);
     await expect(first).resolves.toBeUndefined();
     await expect(second).rejects.toThrow('camera unavailable');
-    expect(failed.setup).toHaveBeenCalledWith({deviceId: {exact: 'missing-id'}});
-    expect(rollback.setup).toHaveBeenCalledWith({deviceId: {exact: 'selected-id'}});
+    // It never got as far as setup(): opening the camera is what failed.
+    expect(failed.setup).not.toHaveBeenCalled();
+    expect(getUserMedia).toHaveBeenCalledWith({video: {deviceId: {exact: 'missing-id'}}});
+    expect(getUserMedia).toHaveBeenLastCalledWith({video: {deviceId: {exact: 'selected-id'}}});
+    expect(rollback.setup).toHaveBeenCalledWith();
     expect(composition.getCameraSelection()).toEqual({deviceId: 'selected-id'});
     expect(composition.getActiveCamera()).toEqual({
       deviceId: 'selected-id',

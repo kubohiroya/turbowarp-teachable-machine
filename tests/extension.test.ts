@@ -56,6 +56,13 @@ function createElement(tagName = 'DIV', rect = visibleRect) {
 }
 
 let querySelector: ReturnType<typeof vi.fn>;
+let getUserMedia: ReturnType<typeof vi.fn>;
+
+/** A stream whose single video track answers the way a real one does. */
+function fakeStream(deviceId = 'default-id', label = 'Default Camera') {
+  const track = {kind: 'video', label, stop: vi.fn(), getSettings: () => ({deviceId})};
+  return {getVideoTracks: () => [track], getTracks: () => [track], track};
+}
 let querySelectorAll: ReturnType<typeof vi.fn>;
 let enumerateDevices: ReturnType<typeof vi.fn>;
 let scripts: any[];
@@ -84,9 +91,10 @@ beforeEach(() => {
       opacity: element.style.opacity || '1'
     }))
   });
+  getUserMedia = vi.fn(async () => fakeStream());
   vi.stubGlobal('requestAnimationFrame', vi.fn());
   vi.stubGlobal('performance', {now: vi.fn(() => 100)});
-  vi.stubGlobal('navigator', {mediaDevices: {enumerateDevices}});
+  vi.stubGlobal('navigator', {mediaDevices: {enumerateDevices, getUserMedia}});
   vi.stubGlobal('Scratch', {
     BlockType: {COMMAND: 'command', REPORTER: 'reporter', BOOLEAN: 'boolean', HAT: 'hat'},
     ArgumentType: {STRING: 'string', NUMBER: 'number', BOOLEAN: 'boolean'},
@@ -790,9 +798,10 @@ describe('TMExtension', () => {
   it('stops MediaStream tracks and rolls back when preview attachment fails', async () => {
     const stop = vi.fn();
     const canvas = createElement('CANVAS');
+    getUserMedia.mockResolvedValue({getTracks: () => [{stop}], getVideoTracks: () => []});
     const webcam = {
       canvas,
-      webcam: {srcObject: {getTracks: () => [{stop}]}},
+      webcam: null,
       setup: vi.fn(async () => undefined),
       play: vi.fn(async () => undefined),
       update: vi.fn()
@@ -848,9 +857,13 @@ describe('TMExtension', () => {
       getSettings: () => ({deviceId: 'front-id'}),
       stop: vi.fn()
     };
+    getUserMedia.mockResolvedValue({
+      getVideoTracks: () => [videoTrack],
+      getTracks: () => [videoTrack]
+    });
     const webcam = {
       canvas,
-      webcam: {srcObject: {getVideoTracks: () => [videoTrack], getTracks: () => [videoTrack]}},
+      webcam: null,
       setup,
       play: vi.fn(async () => undefined),
       update: vi.fn()
@@ -867,7 +880,10 @@ describe('TMExtension', () => {
     await extension.setCameraSelection({CAMERA: 'front'});
     await extension.startCamera();
 
-    expect(setup).toHaveBeenCalledWith({facingMode: {ideal: 'user'}});
+    // The selection has to reach getUserMedia here: letting setup() make the call is what
+    // overwrites the width with 640.
+    expect(getUserMedia).toHaveBeenCalledWith({video: {facingMode: {ideal: 'user'}}});
+    expect(setup).toHaveBeenCalledWith();
     expect(canvas.getContext).toHaveBeenCalledOnce();
     expect(canvas.getContext).toHaveBeenCalledWith('2d');
     expect(extension.cameraDeviceIdReporter()).toBe('front-id');
@@ -948,6 +964,75 @@ describe('TMExtension', () => {
     expect(sharedVideo.srcObject).not.toBeNull();
   });
 
+  it('opens the camera itself, so its own resolution survives', async () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    const stream = fakeStream('native-id', 'Native Camera');
+    getUserMedia.mockResolvedValue(stream);
+    const setup = vi.fn(async () => undefined);
+    const play = vi.fn(async () => undefined);
+    const webcam: Record<string, unknown> = {
+      canvas, webcam: null, width: 320, height: 240, setup, play, update: vi.fn()
+    };
+    function Webcam() { return webcam; }
+    const extension = new TMExtension({}, {runtime: {Webcam} as never});
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+
+    await extension.startCamera();
+
+    // `Webcam.getWebcam` overwrites `options.width` with 640 before every getUserMedia call it
+    // makes, and a 1080p camera then negotiates 640x360 with resizeMode "crop-and-scale". The
+    // constraint cannot be passed around, only avoided -- by having the element already.
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
+    const request = getUserMedia.mock.calls[0][0];
+    expect(request.video).not.toHaveProperty('width');
+    expect(request.video).not.toHaveProperty('height');
+    // No element left for setup() to open, so getWebcam never runs.
+    expect(setup).toHaveBeenCalledWith();
+    expect(webcam.webcam).toBeTruthy();
+    expect((webcam.webcam as {srcObject: unknown}).srcObject).toBe(stream);
+    expect(play).toHaveBeenCalledTimes(1);
+  });
+
+  it('asks its own getUserMedia for the selected device', async () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    getUserMedia.mockResolvedValue(fakeStream('external-id', 'External Camera'));
+    const webcam: Record<string, unknown> = {
+      canvas, webcam: null, width: 320, height: 240,
+      setup: vi.fn(async () => undefined), play: vi.fn(async () => undefined), update: vi.fn()
+    };
+    function Webcam() { return webcam; }
+    const extension = new TMExtension({}, {runtime: {Webcam} as never});
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+    extension.setCameraDeviceId('external-id');
+
+    await extension.startCamera();
+
+    expect(getUserMedia).toHaveBeenCalledWith({video: {deviceId: {exact: 'external-id'}}});
+  });
+
+  it('leaves the camera to setup() where this browser has no getUserMedia', async () => {
+    const stage = createElement();
+    const canvas = createElement('CANVAS');
+    vi.stubGlobal('navigator', {mediaDevices: {enumerateDevices}});
+    const setup = vi.fn(async function (this: Record<string, unknown>) {
+      webcam.webcam = {srcObject: null};
+    });
+    const webcam: Record<string, unknown> = {
+      canvas, webcam: null, width: 320, height: 240, setup, play: vi.fn(async () => undefined), update: vi.fn()
+    };
+    function Webcam() { return webcam; }
+    const extension = new TMExtension({}, {runtime: {Webcam} as never});
+    vi.spyOn(extension, 'findStageElement').mockReturnValue(stage);
+    extension.setCameraDeviceId('external-id');
+
+    await extension.startCamera();
+
+    // Nothing to open the camera with here, so the library keeps its own path and its own error.
+    expect(setup).toHaveBeenCalledWith({deviceId: {exact: 'external-id'}});
+  });
+
   it('asks the lease for the selected device', async () => {
     const stage = createElement();
     const sharedVideo = {srcObject: {getVideoTracks: () => [], getTracks: () => []}};
@@ -991,10 +1076,14 @@ describe('TMExtension', () => {
   it('opens its own camera when Camera Source is not loaded', async () => {
     const stage = createElement();
     const videoTrack = {kind: 'video', label: 'Own Camera', getSettings: () => ({deviceId: 'own-id'}), stop: vi.fn()};
+    getUserMedia.mockResolvedValue({
+      getVideoTracks: () => [videoTrack],
+      getTracks: () => [videoTrack]
+    });
     const play = vi.fn(async () => undefined);
     const webcam = {
       canvas: createElement('CANVAS'),
-      webcam: {srcObject: {getVideoTracks: () => [videoTrack], getTracks: () => [videoTrack]}},
+      webcam: null,
       setup: vi.fn(async () => undefined),
       play,
       update: vi.fn()
@@ -1022,18 +1111,24 @@ describe('TMExtension', () => {
     const stage = createElement();
     const firstStop = vi.fn();
     const secondStop = vi.fn();
-    const createWebcam = (deviceId: string, label: string, stop: ReturnType<typeof vi.fn>) => {
+    const streamFor = (deviceId: string, label: string, stop: ReturnType<typeof vi.fn>) => {
       const track = {kind: 'video', label, getSettings: () => ({deviceId}), stop};
-      return {
-        canvas: createElement('CANVAS'),
-        webcam: {srcObject: {getVideoTracks: () => [track], getTracks: () => [track]}},
-        setup: vi.fn(async () => undefined),
-        play: vi.fn(async () => undefined),
-        update: vi.fn()
-      };
+      return {getVideoTracks: () => [track], getTracks: () => [track]};
     };
-    const first = createWebcam('front-id', 'Front Camera', firstStop);
-    const second = createWebcam('external-id', 'External Camera', secondStop);
+    const streams = [
+      streamFor('front-id', 'Front Camera', firstStop),
+      streamFor('external-id', 'External Camera', secondStop)
+    ];
+    getUserMedia.mockImplementation(async () => streams.shift());
+    const createWebcam = () => ({
+      canvas: createElement('CANVAS'),
+      webcam: null,
+      setup: vi.fn(async () => undefined),
+      play: vi.fn(async () => undefined),
+      update: vi.fn()
+    });
+    const first = createWebcam();
+    const second = createWebcam();
     const webcams = [first, second];
     function Webcam() {
       return webcams.shift();
@@ -1059,7 +1154,7 @@ describe('TMExtension', () => {
     await extension.setCameraSelection({CAMERA: 'external-id'});
 
     expect(firstStop).toHaveBeenCalledOnce();
-    expect(second.setup).toHaveBeenCalledWith({deviceId: {exact: 'external-id'}});
+    expect(getUserMedia).toHaveBeenLastCalledWith({video: {deviceId: {exact: 'external-id'}}});
     expect(extension.recognizing).toBe(true);
     expect(extension.model).toBe(model);
     expect(extension.cameraRunning).toBe(true);
@@ -1076,21 +1171,21 @@ describe('TMExtension', () => {
     const firstStop = vi.fn();
     const firstTrack = {kind: 'video', label: 'Default Camera', getSettings: () => ({deviceId: 'default-id'}), stop: firstStop};
     const rollbackTrack = {kind: 'video', label: 'Default Camera', getSettings: () => ({deviceId: 'default-id'}), stop: vi.fn()};
-    const first = {
-      canvas: createElement('CANVAS'),
-      webcam: {srcObject: {getVideoTracks: () => [firstTrack], getTracks: () => [firstTrack]}},
+    const asStream = (track: unknown) => ({getVideoTracks: () => [track], getTracks: () => [track]});
+    let opened = 0;
+    getUserMedia.mockImplementation(async () => {
+      opened += 1;
+      if (opened === 1) return asStream(firstTrack);
+      if (opened === 2) throw new Error('camera unavailable');
+      return asStream(rollbackTrack);
+    });
+    const createWebcam = () => ({
+      canvas: createElement('CANVAS'), webcam: null,
       setup: vi.fn(async () => undefined), play: vi.fn(async () => undefined), update: vi.fn()
-    };
-    const failed = {
-      canvas: createElement('CANVAS'), webcam: {srcObject: null},
-      setup: vi.fn(async () => { throw new Error('camera unavailable'); }),
-      play: vi.fn(async () => undefined), update: vi.fn()
-    };
-    const rollback = {
-      canvas: createElement('CANVAS'),
-      webcam: {srcObject: {getVideoTracks: () => [rollbackTrack], getTracks: () => [rollbackTrack]}},
-      setup: vi.fn(async () => undefined), play: vi.fn(async () => undefined), update: vi.fn()
-    };
+    });
+    const first = createWebcam();
+    const failed = createWebcam();
+    const rollback = createWebcam();
     const webcams = [first, failed, rollback];
     function Webcam() {
       return webcams.shift();
@@ -1102,7 +1197,9 @@ describe('TMExtension', () => {
     await expect(extension.setCameraSelection({CAMERA: 'missing-id'})).rejects.toThrow('camera unavailable');
 
     expect(firstStop).toHaveBeenCalledOnce();
-    expect(failed.setup).toHaveBeenCalledWith({deviceId: {exact: 'missing-id'}});
+    expect(getUserMedia).toHaveBeenNthCalledWith(2, {video: {deviceId: {exact: 'missing-id'}}});
+    // The camera could not be opened, so setup() was never reached for that attempt.
+    expect(failed.setup).not.toHaveBeenCalled();
     expect(rollback.setup).toHaveBeenCalledWith();
     expect(extension.cameraSelection).toBe('default');
     expect(extension.cameraRunning).toBe(true);

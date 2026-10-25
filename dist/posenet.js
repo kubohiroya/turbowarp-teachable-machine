@@ -85,7 +85,7 @@ var package_default = {
 		"typescript": "^5.9.3",
 		"vite": "^8.2.2",
 		"vitest": "^4.0.14",
-		"@kubohiroya/turbowarp-extension-data-editor": "^0.2.1"
+		"@kubohiroya/turbowarp-extension-data-editor": "^0.3.3"
 	},
 	keywords: [
 		"turbowarp",

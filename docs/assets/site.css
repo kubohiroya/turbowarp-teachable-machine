@@ -995,3 +995,18 @@ footer {
     transform: none;
   }
 }
+
+:root{color-scheme:light dark}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ink:#e9eef5;--muted:#a0adbe;--paper:#0f141b;--surface:#171d26;
+    --navy:#8fb4d8;--teal:#4fc4b6;--teal-soft:#15302c;
+    --coral:#f08a74;--coral-soft:#33201b;
+    --gold:#f0c56a;--gold-soft:#332a14;
+    --line:#2a323d;--shadow:0 18px 45px rgba(0,0,0,.5);
+  }
+  .topbar{border-bottom-color:rgba(42,50,61,.85);background:rgba(15,20,27,.9)}
+  .language-switch{background:#171d26}
+  .github-link{background:#171d26}
+  .github-link:hover{background:#1d242f}
+}

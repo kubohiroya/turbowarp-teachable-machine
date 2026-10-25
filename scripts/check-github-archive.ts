@@ -7,7 +7,10 @@ import {fileURLToPath} from 'node:url';
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 const temporaryRoot = await mkdtemp(path.join(tmpdir(), 'kubohiroyatm-archive-'));
 const archiveRoot = path.join(temporaryRoot, 'package');
-const excludedTopLevel = new Set(['.git', 'dist', 'node_modules']);
+// `.claude` is a tool artifact, and `.claude/worktrees/<name>` is a whole second checkout of
+// this repository -- copying it into the archive would carry another tree's `dist` along and slow
+// `prepack` down for nothing.
+const excludedTopLevel = new Set(['.git', '.claude', 'dist', 'node_modules']);
 
 try {
   await cp(repositoryRoot, archiveRoot, {

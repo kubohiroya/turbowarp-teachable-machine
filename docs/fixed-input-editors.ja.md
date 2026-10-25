@@ -31,6 +31,6 @@ Schemaの正本は`schemas/block-editor-fixed-inputs.schema.json`。各登録は
 
 同じ画面では未保存draftと無効bufferを保持し、保存失敗後も保持する。取消・dispose・project/target/登録失効で破棄し、再openは現在rawから始める。getInfoに存在するopcodeだけ登録し、APIまたはopcode集合の変化ではcleanupして再登録する。部分登録失敗・runtime終了・disposeでcleanupする。
 
-共通依存はGit commit `485f0e550e622235624b5e9176820161aeeba252`へmanifest・lock・実解決を揃える。型とpure数値parserだけを利用し、runtime bundleと公開型の依存閉包をpack consumerで確認する。既存SourceForms/Descendantsと共存する。
+共通依存はnpm版 `@kubohiroya/turbowarp-extension-data-editor@0.3.4` へmanifest・lock・実解決を揃える。型とpure数値parserだけを利用し、runtime bundleと公開型の依存閉包をpack consumerで確認する。既存SourceForms/Descendantsと共存する。
 
 切戻しは固定入力フラグをOFFにして再読込する。依存を戻すときはmanifest・lock・実解決を一組で戻す。旧sb3の移行は不要。ローカル検証のみで、commit・push・Issue・PR・merge・Pages・npm公開を含まない。

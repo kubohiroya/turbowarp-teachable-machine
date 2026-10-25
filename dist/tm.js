@@ -1257,6 +1257,7 @@
     },
     type: "module",
     files: [
+      "assets/block-icon.svg",
       "dist/",
       "README.md",
       "README.ja.md",

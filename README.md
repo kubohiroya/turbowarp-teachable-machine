@@ -62,20 +62,20 @@ select that file, and keep **Run without sandbox** enabled.
 The download, and the artifact a composite runtime fetches, is the version-pinned build on jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.6.0/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/tm.js
 ```
 
 A composite runtime can load or embed the same reviewed artifact without rewriting a minified
 third-party bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.6.0/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.6.0
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.0
 ```
 
 ### Names

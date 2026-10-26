@@ -50,19 +50,19 @@ flowchart LR
 ダウンロード先、および合成ランタイムが取得する成果物は、jsDelivr上のバージョン固定ビルドです。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.6.0/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/tm.js
 ```
 
 合成ランタイムは、縮小済みの第三者バンドルを書き換えることなく、同じ検証済み成果物を読み込んだり同梱したりできます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@3.6.0/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.0/dist/runtime.js
 ```
 
 公開済みパッケージを別のプロジェクトに追加するには次のようにします。
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@3.6.0
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.0
 ```
 
 ### 名前について

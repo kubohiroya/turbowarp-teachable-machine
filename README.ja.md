@@ -399,6 +399,7 @@ const offlineRuntime = createBundledTMRuntime({runtime: tmPose, projectBundle});
 ## 開発
 
 ```bash
+npm install --global corepack@latest
 corepack enable
 pnpm install --frozen-lockfile
 pnpm check

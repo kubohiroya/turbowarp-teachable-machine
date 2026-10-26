@@ -12,10 +12,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: false
-      - run: corepack enable
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check

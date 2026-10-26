@@ -44,8 +44,8 @@ var package_default = {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
 	},
-	packageManager: "pnpm@11.11.0",
-	engines: { "node": ">=22.18.0" },
+	packageManager: "pnpm@11.28.8",
+	engines: { "node": ">=24" },
 	scripts: {
 		"dev": "vite build --watch",
 		"typecheck": "tsc --noEmit",

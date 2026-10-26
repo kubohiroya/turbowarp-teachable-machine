@@ -942,6 +942,7 @@ Returns the latest recorded error message.
 ## Development
 
 ```bash
+npm install --global corepack@latest
 corepack enable
 pnpm install --frozen-lockfile
 pnpm check

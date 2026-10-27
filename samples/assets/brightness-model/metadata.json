@@ -1,0 +1,17 @@
+{
+  "tfjsVersion": "4.22.0",
+  "packageName": "@teachablemachine/image",
+  "packageVersion": "0.8.5",
+  "modelName": "Authored Dark / Light brightness demo",
+  "timeStamp": "2026-10-28T00:00:00.000Z",
+  "labels": [
+    "Dark",
+    "Light"
+  ],
+  "imageSize": 32,
+  "grayscale": false,
+  "userMetadata": {
+    "source": "Hand-authored analytic RGB-mean classifier; not a trained Teachable Machine export.",
+    "license": "MPL-2.0"
+  }
+}

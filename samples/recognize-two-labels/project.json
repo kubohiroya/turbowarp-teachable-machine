@@ -1,0 +1,1087 @@
+{
+  "targets": [
+    {
+      "isStage": true,
+      "name": "Stage",
+      "variables": {
+        "sample-state": [
+          "State",
+          ""
+        ],
+        "sample-status": [
+          "Status",
+          ""
+        ],
+        "sample-camera": [
+          "Camera running",
+          ""
+        ],
+        "sample-recognizing": [
+          "Recognizing",
+          ""
+        ],
+        "sample-model": [
+          "Model loaded",
+          ""
+        ],
+        "sample-label": [
+          "Label",
+          ""
+        ],
+        "sample-score": [
+          "Confidence",
+          ""
+        ],
+        "sample-error": [
+          "Error",
+          ""
+        ]
+      },
+      "lists": {},
+      "broadcasts": {},
+      "blocks": {
+        "b1": {
+          "opcode": "event_whenflagclicked",
+          "parent": null,
+          "next": "b2",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": true,
+          "x": 35,
+          "y": 35
+        },
+        "b2": {
+          "opcode": "data_setvariableto",
+          "parent": "b1",
+          "next": "b3",
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Running"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "State",
+              "sample-state"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b3": {
+          "opcode": "kubohiroyatm_stopCamera",
+          "parent": "b2",
+          "next": "b4",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b4": {
+          "opcode": "kubohiroyatm_setRecognitionMode",
+          "parent": "b3",
+          "next": "b6",
+          "inputs": {
+            "MODE": [
+              1,
+              "b5"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b5": {
+          "opcode": "kubohiroyatm_menu_recognitionModeMenu",
+          "parent": "b4",
+          "next": null,
+          "inputs": {},
+          "fields": {
+            "recognitionModeMenu": [
+              "image",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "b6": {
+          "opcode": "kubohiroyatm_setComputeMode",
+          "parent": "b4",
+          "next": "b8",
+          "inputs": {
+            "MODE": [
+              1,
+              "b7"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b7": {
+          "opcode": "kubohiroyatm_menu_computeModeMenu",
+          "parent": "b6",
+          "next": null,
+          "inputs": {},
+          "fields": {
+            "computeModeMenu": [
+              "cpu",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "b8": {
+          "opcode": "control_if",
+          "parent": "b6",
+          "next": "b12",
+          "inputs": {
+            "CONDITION": [
+              3,
+              "b9",
+              [
+                10,
+                ""
+              ]
+            ],
+            "SUBSTACK": [
+              2,
+              "b11"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b9": {
+          "opcode": "operator_not",
+          "parent": "b8",
+          "next": null,
+          "inputs": {
+            "OPERAND": [
+              3,
+              "b10",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b10": {
+          "opcode": "kubohiroyatm_isModelLoaded",
+          "parent": "b9",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b11": {
+          "opcode": "kubohiroyatm_setModelURL",
+          "parent": "b8",
+          "next": null,
+          "inputs": {
+            "URL": [
+              1,
+              [
+                10,
+                "https://kubohiroya.github.io/turbowarp-teachable-machine/samples/assets/brightness-model/"
+              ]
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b12": {
+          "opcode": "data_setvariableto",
+          "parent": "b8",
+          "next": "b14",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b13",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Camera running",
+              "sample-camera"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b13": {
+          "opcode": "kubohiroyatm_isCameraRunning",
+          "parent": "b12",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b14": {
+          "opcode": "data_setvariableto",
+          "parent": "b12",
+          "next": "b16",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b15",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Recognizing",
+              "sample-recognizing"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b15": {
+          "opcode": "kubohiroyatm_isRecognizing",
+          "parent": "b14",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b16": {
+          "opcode": "data_setvariableto",
+          "parent": "b14",
+          "next": "b18",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b17",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Model loaded",
+              "sample-model"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b17": {
+          "opcode": "kubohiroyatm_isModelLoaded",
+          "parent": "b16",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b18": {
+          "opcode": "data_setvariableto",
+          "parent": "b16",
+          "next": "b20",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b19",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Label",
+              "sample-label"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b19": {
+          "opcode": "kubohiroyatm_currentPoseReporter",
+          "parent": "b18",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b20": {
+          "opcode": "data_setvariableto",
+          "parent": "b18",
+          "next": "b22",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b21",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Confidence",
+              "sample-score"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b21": {
+          "opcode": "kubohiroyatm_scoreReporter",
+          "parent": "b20",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b22": {
+          "opcode": "data_setvariableto",
+          "parent": "b20",
+          "next": "b24",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b23",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Error",
+              "sample-error"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b23": {
+          "opcode": "kubohiroyatm_lastErrorReporter",
+          "parent": "b22",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b24": {
+          "opcode": "data_setvariableto",
+          "parent": "b22",
+          "next": "b25",
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "L: load model only; Start: camera"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Status",
+              "sample-status"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b25": {
+          "opcode": "data_setvariableto",
+          "parent": "b24",
+          "next": null,
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Ready"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "State",
+              "sample-state"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b26": {
+          "opcode": "event_whenkeypressed",
+          "parent": null,
+          "next": "b27",
+          "inputs": {},
+          "fields": {
+            "KEY_OPTION": [
+              "l",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": true,
+          "x": 35,
+          "y": 500
+        },
+        "b27": {
+          "opcode": "data_setvariableto",
+          "parent": "b26",
+          "next": "b28",
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Loading model; no camera"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Status",
+              "sample-status"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b28": {
+          "opcode": "kubohiroyatm_loadModel",
+          "parent": "b27",
+          "next": "b29",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b29": {
+          "opcode": "data_setvariableto",
+          "parent": "b28",
+          "next": "b31",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b30",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Model loaded",
+              "sample-model"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b30": {
+          "opcode": "kubohiroyatm_isModelLoaded",
+          "parent": "b29",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b31": {
+          "opcode": "data_setvariableto",
+          "parent": "b29",
+          "next": null,
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Model loaded; Start requires camera"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Status",
+              "sample-status"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b32": {
+          "opcode": "event_whenkeypressed",
+          "parent": null,
+          "next": "b33",
+          "inputs": {},
+          "fields": {
+            "KEY_OPTION": [
+              "s",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": true,
+          "x": 35,
+          "y": 500
+        },
+        "b33": {
+          "opcode": "kubohiroyatm_stopCamera",
+          "parent": "b32",
+          "next": "b34",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b34": {
+          "opcode": "data_setvariableto",
+          "parent": "b33",
+          "next": null,
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Stopped; model stays loaded"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Status",
+              "sample-status"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b35": {
+          "opcode": "event_whenflagclicked",
+          "parent": null,
+          "next": "b36",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": true,
+          "x": 1000,
+          "y": 35
+        },
+        "b36": {
+          "opcode": "control_forever",
+          "parent": "b35",
+          "next": null,
+          "inputs": {
+            "SUBSTACK": [
+              2,
+              "b37"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b37": {
+          "opcode": "data_setvariableto",
+          "parent": "b36",
+          "next": "b39",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b38",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Camera running",
+              "sample-camera"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b38": {
+          "opcode": "kubohiroyatm_isCameraRunning",
+          "parent": "b37",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b39": {
+          "opcode": "data_setvariableto",
+          "parent": "b37",
+          "next": "b41",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b40",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Recognizing",
+              "sample-recognizing"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b40": {
+          "opcode": "kubohiroyatm_isRecognizing",
+          "parent": "b39",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b41": {
+          "opcode": "data_setvariableto",
+          "parent": "b39",
+          "next": "b43",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b42",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Model loaded",
+              "sample-model"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b42": {
+          "opcode": "kubohiroyatm_isModelLoaded",
+          "parent": "b41",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b43": {
+          "opcode": "data_setvariableto",
+          "parent": "b41",
+          "next": "b45",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b44",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Label",
+              "sample-label"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b44": {
+          "opcode": "kubohiroyatm_currentPoseReporter",
+          "parent": "b43",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b45": {
+          "opcode": "data_setvariableto",
+          "parent": "b43",
+          "next": "b47",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b46",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Confidence",
+              "sample-score"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b46": {
+          "opcode": "kubohiroyatm_scoreReporter",
+          "parent": "b45",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b47": {
+          "opcode": "data_setvariableto",
+          "parent": "b45",
+          "next": "b49",
+          "inputs": {
+            "VALUE": [
+              3,
+              "b48",
+              [
+                10,
+                ""
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Error",
+              "sample-error"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b48": {
+          "opcode": "kubohiroyatm_lastErrorReporter",
+          "parent": "b47",
+          "next": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b49": {
+          "opcode": "control_wait",
+          "parent": "b47",
+          "next": null,
+          "inputs": {
+            "DURATION": [
+              1,
+              [
+                4,
+                "0.25"
+              ]
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        }
+      },
+      "comments": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "",
+          "name": "Instructions",
+          "bitmapResolution": 1,
+          "md5ext": "backdrop.svg",
+          "dataFormat": "svg",
+          "rotationCenterX": 240,
+          "rotationCenterY": 180
+        }
+      ],
+      "sounds": [],
+      "volume": 100,
+      "layerOrder": 0,
+      "tempo": 60,
+      "videoTransparency": 50,
+      "videoState": "off",
+      "textToSpeechLanguage": null
+    },
+    {
+      "isStage": false,
+      "name": "Start",
+      "variables": {},
+      "lists": {},
+      "broadcasts": {},
+      "blocks": {
+        "b50": {
+          "opcode": "event_whenthisspriteclicked",
+          "parent": null,
+          "next": "b51",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": true,
+          "x": 35,
+          "y": 35
+        },
+        "b51": {
+          "opcode": "data_setvariableto",
+          "parent": "b50",
+          "next": "b52",
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Approve camera; errors shown above"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Status",
+              "sample-status"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "b52": {
+          "opcode": "kubohiroyatm_startRecognition",
+          "parent": "b51",
+          "next": "b53",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b53": {
+          "opcode": "kubohiroyatm_showPreview",
+          "parent": "b52",
+          "next": "b54",
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "b54": {
+          "opcode": "data_setvariableto",
+          "parent": "b53",
+          "next": null,
+          "inputs": {
+            "VALUE": [
+              1,
+              [
+                10,
+                "Showing Dark / Light predictions"
+              ]
+            ]
+          },
+          "fields": {
+            "VARIABLE": [
+              "Status",
+              "sample-status"
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        }
+      },
+      "comments": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "",
+          "name": "Demo",
+          "bitmapResolution": 1,
+          "md5ext": "start.svg",
+          "dataFormat": "svg",
+          "rotationCenterX": 70,
+          "rotationCenterY": 22
+        }
+      ],
+      "sounds": [],
+      "volume": 100,
+      "layerOrder": 1,
+      "visible": true,
+      "x": 110,
+      "y": -105,
+      "size": 100,
+      "direction": 90,
+      "draggable": false,
+      "rotationStyle": "all around"
+    }
+  ],
+  "monitors": [
+    {
+      "id": "sample-status",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Status"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 105,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    },
+    {
+      "id": "sample-camera",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Camera running"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 132,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    },
+    {
+      "id": "sample-recognizing",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Recognizing"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 159,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    },
+    {
+      "id": "sample-model",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Model loaded"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 186,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    },
+    {
+      "id": "sample-label",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Label"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 213,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    },
+    {
+      "id": "sample-score",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Confidence"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 240,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    },
+    {
+      "id": "sample-error",
+      "mode": "default",
+      "opcode": "data_variable",
+      "params": {
+        "VARIABLE": "Error"
+      },
+      "spriteName": null,
+      "value": "",
+      "width": 0,
+      "height": 0,
+      "x": 18,
+      "y": 267,
+      "visible": true,
+      "sliderMin": 0,
+      "sliderMax": 100,
+      "isDiscrete": true
+    }
+  ],
+  "extensions": [],
+  "meta": {
+    "semver": "3.0.0",
+    "vm": "0.2.0",
+    "agent": "TurboWarp Plus minimal samples"
+  }
+}

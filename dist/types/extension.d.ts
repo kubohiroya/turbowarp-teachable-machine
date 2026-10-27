@@ -8,7 +8,7 @@ export declare const ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANG
 /** The readback canvas size every downstream frame reader is written against. */
 export declare const CAMERA_FRAME_WIDTH = 320;
 export declare const CAMERA_FRAME_HEIGHT = 240;
-export declare const BLOCK_ICON_URI: string;
+export declare const BLOCK_ICON_URI: `data:image/svg+xml,${string}`;
 export type RecognitionMode = 'pose' | 'image' | 'audio';
 /** Where the square the model saw sits inside the camera's frame. */
 export interface PoseCropWindow {
@@ -81,7 +81,7 @@ export declare class TMExtension {
         id: string;
         name: any;
         docsURI: string;
-        blockIconURI: string;
+        blockIconURI: `data:image/svg+xml,${string}`;
         blocks: {
             arguments?: {
                 [k: string]: {

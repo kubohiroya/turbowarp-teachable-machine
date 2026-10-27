@@ -19,6 +19,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - name: Verify minimal demos
+        run: node scripts/build-samples.mjs --check && node --test scripts/verify-samples.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: turbowarp-teachable-machine

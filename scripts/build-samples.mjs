@@ -127,7 +127,7 @@ export async function buildSamples({check = false} = {}) {
     const output = new URL(`samples/${sample.name}.sb3`, root);
     const archive = zip(entries);
     if (check) {
-      assert.deepEqual(await readFile(output), archive, `Stale sample: ${sample.name}; run samples:build`);
+      assert.deepEqual(await readFile(output), archive, `Stale sample: ${sample.name}; run node scripts/build-samples.mjs`);
     } else {
       await writeFile(output, archive);
     }

@@ -10,6 +10,14 @@ confidence score, and Boolean conditions that Scratch-style scripts can act on.
 
 **User guide:** [English](https://kubohiroya.github.io/turbowarp-teachable-machine/) | [日本語](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/) · **[Block reference](#blocks)**
 
+## Minimal demo
+
+[Open in TurboWarp Editor](https://turbowarp.org/editor?project_url=https%3A%2F%2Fkubohiroya.github.io%2Fturbowarp-teachable-machine%2Fsamples%2Frecognize-two-labels.sb3) · [SB3](https://kubohiroya.github.io/turbowarp-teachable-machine/samples/recognize-two-labels.sb3)
+
+A hand-authored analytic Dark/Light brightness classifier (32-byte weights), not a trained Google Teachable Machine export or a claim of general recognition accuracy. Green flag is idle; L loads only model files; click Start to request camera permission and recognize. S invokes stopCamera and removes recognition/preview. Use a dark or light plain object. Requires HTTPS, a camera, and network access for the existing reviewed Teachable Machine/TensorFlow browser runtime. Camera recognition, lighting accuracy, permission denial/reconnect, and physical resource release are unverified. No microphone or audio is used. The existing extension does not bind stopCamera to PROJECT_STOP_ALL: press S before Stop, or close the tab. The model remains in memory until the tab closes. Changes to the default OFF flags are not required.
+
+[Editable source and regeneration](samples/README.md)
+
 ## What it does
 
 ```mermaid
@@ -989,3 +997,5 @@ The opt-in fixed input forms, and the rules that keep existing data intact, are 
 ## License
 
 MPL-2.0
+
+[Model formula, source and license](samples/assets/brightness-model/README.md)

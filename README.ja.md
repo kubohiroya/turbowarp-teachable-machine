@@ -8,6 +8,18 @@
 
 **利用ガイド:** [English](https://kubohiroya.github.io/turbowarp-teachable-machine/) | [日本語](https://kubohiroya.github.io/turbowarp-teachable-machine/ja/) · **[ブロック一覧](#ブロック)**
 
+## 最小デモ
+
+[TurboWarp Editorで開く](https://turbowarp.org/editor?project_url=https%3A%2F%2Fkubohiroya.github.io%2Fturbowarp-teachable-machine%2Fsamples%2Frecognize-two-labels.sb3) · [SB3](https://kubohiroya.github.io/turbowarp-teachable-machine/samples/recognize-two-labels.sb3)
+
+緑の旗は未開始状態です。Lで自作のDark/Light明度モデルだけを読み込み、青いStartを明示クリックするとカメラ権限を求め画像認識を開始します。SでstopCameraし、認識・プレビューを停止します。明るい/暗い無地の対象をカメラに示してラベルとscoreを確認してください。モデルはRGB平均値を使う手定義の32byte重みで、Google Teachable Machineで学習した一般画像分類モデルではありません。
+
+要件: HTTPS・カメラ権限・対応ブラウザ / 本体既存のTeachable Machine/TensorFlow browser runtime取得通信 / 自作32byte重み・model.json・metadata・MPLライセンスをPages配信。
+
+未検証: 実カメラのDark/Light連続認識と環境光による精度 / 実機カメラの拒否/再接続/解放。自動検証でカメラ・マイク・音声を開始しない。 実機停止はSを先に押してから停止ボタン、またはタブを閉じてください。本体はPROJECT_STOP_ALLへstopCameraを結び付けていません。モデルはタブ終了までメモリに保持します。
+
+[編集元・再生成手順](samples/README.md)
+
 ## できること
 
 ```mermaid
@@ -426,3 +438,5 @@ npmへの公開には、長期間有効な書き込みトークンではなくGi
 ## ライセンス
 
 MPL-2.0
+
+[同梱モデルの式・編集元・ライセンス](samples/assets/brightness-model/README.md)

@@ -72,8 +72,11 @@
     "archive:check": "node scripts/check-github-archive.ts",
     "pack:check": "npm pack --dry-run --ignore-scripts",
     "release:check": "npm publish --dry-run --access public --tag latest",
-    "check": "npm run typecheck && npm run test && npm run build && npm run types:composition:check && npm run types:posenet:check && npm run docs:check && npm run docs:pages:check && npm run release:consistency:check && npm run check:dist && npm run archive:check && npm run pack:check",
-    "prepack": "npm run build && npm run release:consistency:check"
+    "check": "npm run typecheck && npm run test && npm run build && npm run types:composition:check && npm run types:posenet:check && npm run docs:check && npm run docs:pages:check && npm run release:consistency:check && npm run check:dist && npm run archive:check && npm run pack:check && pnpm run samples:check",
+    "prepack": "npm run build && npm run release:consistency:check",
+    "samples:build": "node scripts/build-samples.mjs",
+    "samples:check": "node scripts/build-samples.mjs --check && node --test scripts/verify-samples.mjs",
+    "pages:build": "node scripts/prepare-pages.mjs"
   },
   "devDependencies": {
     "@kubohiroya/turbowarp-camera-source": "^0.21.0",

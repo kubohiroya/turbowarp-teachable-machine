@@ -10,6 +10,7 @@ const debugUrl = process.env.TEACHABLE_MACHINE_CDP_URL ?? 'http://127.0.0.1:9222
 const modelUrl = 'https://teachablemachine.withgoogle.com/models/R9i0aRHth/';
 const reportPath = process.env.TEACHABLE_MACHINE_TEST_REPORT ??
   join(tmpdir(), 'teachable-machine-editor-results.json');
+const packageMetadata = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 const targets = await (await fetch(`${debugUrl}/json/list`)).json();
 const target = targets.find((entry) => entry.type === 'page');
 assert(target, 'Open a blank page in the test browser first.');
@@ -149,10 +150,11 @@ try {
         const selection = await extension.ensureComputeBackend();
         extension.setModelURL({URL: ${JSON.stringify(modelUrl)}});
         await extension.loadModel();
-        return {mode, selection, modelLoaded: extension.isModelLoaded(),
+        return {mode, version: extension.versionReporter(), selection, modelLoaded: extension.isModelLoaded(),
           classes: extension.model.getClassLabels(), isolated: crossOriginIsolated};
       })()`, true);
       assert.equal(startup.mode, backend);
+      assert.equal(startup.version, `${packageMetadata.version}-typescript`);
       assert.equal(startup.selection.backend, backend);
       assert(startup.modelLoaded);
 

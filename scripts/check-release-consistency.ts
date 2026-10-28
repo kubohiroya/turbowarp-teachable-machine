@@ -74,12 +74,14 @@ if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) {
   errors.push(`package.json contains an invalid version: ${version}`);
 }
 
-const readme = await readFile('README.md', 'utf8');
-if (readme.split(pinnedPackage).length - 1 < 2) {
-  errors.push(`README.md must contain version-pinned install and CDN examples for ${pinnedPackage}`);
-}
-if (!readme.includes('MPL-2.0')) {
-  errors.push('README.md must identify the package license as SPDX MPL-2.0');
+for (const path of ['README.md', 'README.ja.md']) {
+  const readme = await readFile(path, 'utf8');
+  if (readme.split(pinnedPackage).length - 1 < 2) {
+    errors.push(`${path} must contain version-pinned install and CDN examples for ${pinnedPackage}`);
+  }
+  if (!readme.includes('MPL-2.0')) {
+    errors.push(`${path} must identify the package license as SPDX MPL-2.0`);
+  }
 }
 
 for (const path of ['docs/index.html', 'docs/ja/index.html']) {

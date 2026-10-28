@@ -92,7 +92,7 @@ Existing Scratch extension IDs, opcodes, and runtime API names remain compatible
 The version-pinned lightweight build uses this CDN URL after publication:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/teachable-machine.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/teachable-machine.js
 ```
 
 The lightweight extension loads one reviewed browser runtime that contains one TensorFlow.js 4.22.0
@@ -104,13 +104,13 @@ Composite runtimes can load or embed the same artifact without rewriting a minif
 bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.2
 ```
 
 ### Names

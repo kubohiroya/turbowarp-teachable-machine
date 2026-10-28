@@ -1,5 +1,6 @@
 import {readFile, readdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
+import {Script} from 'node:vm';
 import process from 'node:process';
 
 interface PackageMetadata {
@@ -69,17 +70,18 @@ for (const path of distributionSources) {
   }
 }
 
-
 if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) {
   errors.push(`package.json contains an invalid version: ${version}`);
 }
 
-const readme = await readFile('README.md', 'utf8');
-if (readme.split(pinnedPackage).length - 1 < 2) {
-  errors.push(`README.md must contain version-pinned install and CDN examples for ${pinnedPackage}`);
-}
-if (!readme.includes('MPL-2.0')) {
-  errors.push('README.md must identify the package license as SPDX MPL-2.0');
+for (const path of ['README.md', 'README.ja.md']) {
+  const readme = await readFile(path, 'utf8');
+  if (readme.split(pinnedPackage).length - 1 < 2) {
+    errors.push(`${path} must contain version-pinned install and CDN examples for ${pinnedPackage}`);
+  }
+  if (!readme.includes('MPL-2.0')) {
+    errors.push(`${path} must identify the package license as SPDX MPL-2.0`);
+  }
 }
 
 for (const path of ['docs/index.html', 'docs/ja/index.html']) {
@@ -190,6 +192,39 @@ const notices = await readFile('THIRD_PARTY_NOTICES.md', 'utf8');
 const distributedNotices = await readFile('dist/THIRD_PARTY_NOTICES.md', 'utf8');
 if (notices !== distributedNotices) {
   errors.push('dist/THIRD_PARTY_NOTICES.md must match the repository notice');
+}
+
+const threadedWasmFactory = await readFile(
+  'node_modules/@tensorflow/tfjs-backend-wasm/wasm-out/tfjs-backend-wasm-threaded-simd.js',
+  'utf8'
+);
+for (const backend of ['webgpu', 'wasm']) {
+  const path = `dist/teachable-machine-${backend}.js`;
+  const source = await readFile(path, 'utf8');
+  new Script(source, {filename: path});
+  if (packageMetadata.exports?.[`./${path}`] !== `./${path}`) {
+    errors.push(`package.json must export ./${path}`);
+  }
+  if (!source.includes(notices) || !source.startsWith('/*! @license')) {
+    errors.push(`${path} must embed the complete third-party notice`);
+  }
+  if (!source.includes(threadedWasmFactory)) {
+    errors.push(`${path} must preserve the upstream threaded WASM factory for worker serialization`);
+  }
+  for (const binary of wasmFiles.filter((file) => file.path.endsWith('.wasm'))) {
+    const bytes = await readFile(`dist/wasm/${binary.path}`);
+    if (!source.includes(`data:application/octet-stream;base64,${bytes.toString('base64')}`)) {
+      errors.push(`${path} must embed the pinned ${binary.path}`);
+    }
+  }
+  for (const message of [
+    ' has already been set. Overwriting the platform with ',
+    ' backend was already registered. Reusing existing backend factory.'
+  ]) {
+    if (source.split(message).length - 1 !== 1) {
+      errors.push(`${path} must contain exactly one TensorFlow.js core`);
+    }
+  }
 }
 
 const license = await readFile('LICENSE', 'utf8');

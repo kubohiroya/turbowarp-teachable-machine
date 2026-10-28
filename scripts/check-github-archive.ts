@@ -33,6 +33,8 @@ try {
   });
   for (const output of [
     'dist/teachable-machine.js',
+    'dist/teachable-machine-webgpu.js',
+    'dist/teachable-machine-wasm.js',
     'dist/composition.js',
     'dist/runtime.js',
     'dist/backend-wasm.js',

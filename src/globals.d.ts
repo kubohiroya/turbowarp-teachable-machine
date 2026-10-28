@@ -28,3 +28,9 @@ declare const tmPose: any;
 declare const tmImage: any;
 declare const tmAudio: any;
 declare const tmCompute: any;
+declare const __TEACHABLE_MACHINE_DEFAULT_BACKEND__: 'webgpu' | 'wasm';
+
+declare module 'virtual:teachable-machine-wasm' {
+  const paths: Record<string, string>;
+  export default paths;
+}

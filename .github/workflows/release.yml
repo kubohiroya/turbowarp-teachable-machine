@@ -9,6 +9,7 @@ name: Release
 #   Workflow filename     release.yml   <- the filename alone
 #   Environment           (empty)
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*"
@@ -23,6 +24,7 @@ concurrency:
 
 jobs:
   release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -150,3 +152,78 @@ jobs:
               npm dist-tag add "$name@$version" "$tag"
             fi
           done
+
+  finish-existing-release:
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'kubohiroya/turbowarp-teachable-machine' && github.ref == 'refs/heads/codex/release/teachable-machine-4.1.0-tag-recovery'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '26.12.1'
+      - name: Verify the immutable published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {execFileSync} from 'node:child_process';
+          const repository = 'kubohiroya/turbowarp-teachable-machine';
+          const name = '@kubohiroya/turbowarp-teachable-machine', version = '4.1.0';
+          const commit = 'd16fda0f4bd6f8307d18aee1f46aa3623a8b64df';
+          const sha1 = 'e3bad2def7c018c88604ca7c7049744d71d0827c';
+          const sha256 = '5d592ba92d3340ea4d96ec4c50e7d07b7d0fe8eb42b2c94bca6f1cf5f38721b5';
+          const api = path => JSON.parse(execFileSync('gh', ['api', '--method', 'GET', `repos/${repository}/${path}`], {encoding:'utf8'}));
+          const get = async url => {const r=await fetch(url);assert.equal(r.status,200);return r;};
+          const tag = api('git/ref/tags/v4.1.0').object;
+          assert.equal(tag.type === 'tag' ? api(`git/tags/${tag.sha}`).object.sha : tag.sha, commit);
+          assert.equal(api('git/ref/heads/main').object.sha, commit);
+          const manifestFile = api(`contents/package.json?ref=${commit}`);
+          const manifest = JSON.parse(Buffer.from(manifestFile.content,'base64').toString());
+          assert.equal(manifest.name,name);assert.equal(manifest.version,version);
+          const author={name:'Hiroya Kubo',email:'hiroya@cuc.ac.jp',url:'https://github.com/kubohiroya'};
+          assert.deepEqual(manifest.author,author);
+          const published=await (await get(`https://registry.npmjs.org/${encodeURIComponent(name)}/${version}`)).json();
+          assert.equal(published.name,name);assert.equal(published.version,version);assert.deepEqual(published.author,author);
+          assert.equal(published.dist.shasum,sha1);
+          assert.equal(published.dist.attestations?.provenance?.predicateType,'https://slsa.dev/provenance/v1');
+          assert.equal(new URL(published.dist.tarball).origin,'https://registry.npmjs.org');
+          const bytes=Buffer.from(await (await get(published.dist.tarball)).arrayBuffer());
+          assert.equal(createHash('sha1').update(bytes).digest('hex'),sha1);
+          assert.equal(createHash('sha256').update(bytes).digest('hex'),sha256);
+          assert.equal('sha512-'+createHash('sha512').update(bytes).digest('base64'),published.dist.integrity);
+          const release=api('releases/tags/v4.1.0');assert.equal(release.draft,false);assert.equal(release.tag_name,'v4.1.0');
+          const asset=release.assets.find(a=>a.name==='kubohiroya-turbowarp-teachable-machine-4.1.0.tgz');
+          assert(asset);assert.equal(asset.digest,'sha256:'+sha256);assert.equal(asset.size,bytes.length);
+          const tags=(await (await get(`https://registry.npmjs.org/${encodeURIComponent(name)}`)).json())['dist-tags'];
+          assert.equal(tags.latest,version);assert(['4.0.2',version].includes(tags.next));
+          console.log(JSON.stringify({repository,name,version,commit,sha1,sha256,archiveBytes:bytes.length,distTagsBefore:tags,operation:'sync-existing-version-tags-only'}));
+          JS
+      - name: Use npm with OIDC dist-tag support
+        run: npm install --global npm@11.21.0
+      - name: Synchronize the existing version tags through trusted publishing
+        run: |
+          set -euo pipefail
+          test "$(npm --version)" = 11.21.0
+          name='@kubohiroya/turbowarp-teachable-machine'
+          version='4.1.0'
+          test "$(npm view "$name@$version" dist.shasum --prefer-online)" = 'e3bad2def7c018c88604ca7c7049744d71d0827c'
+          test "$(npm view "$name" dist-tags.latest --prefer-online)" = "$version"
+          current="$(npm view "$name" dist-tags.next --prefer-online)"
+          case "$current" in 4.0.2|4.1.0) ;; *) exit 1 ;; esac
+          if [ "$current" != "$version" ]; then
+            npm dist-tag add "$name@$version" next --registry=https://registry.npmjs.org
+          fi
+          for attempt in $(seq 1 30); do
+            latest="$(npm view "$name" dist-tags.latest --prefer-online)"
+            next="$(npm view "$name" dist-tags.next --prefer-online)"
+            if [ "$latest" = "$version" ] && [ "$next" = "$version" ]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1

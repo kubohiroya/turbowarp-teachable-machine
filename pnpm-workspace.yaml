@@ -3,14 +3,9 @@ allowBuilds:
   esbuild: false
 
 minimumReleaseAgeExclude:
-  - '@kubohiroya/turbowarp-camera-source@0.21.0'
-  - '@kubohiroya/vite-plugin-turbowarp-extension@0.9.0'
-  - '@kubohiroya/turbowarp-extension-data-editor@0.4.0'
-  - '@kubohiroya/turbowarp-camera-source@0.20.0'
-  - '@kubohiroya/vite-plugin-turbowarp-extension@0.8.0'
-  - '@kubohiroya/turbowarp-extension-data-editor@0.3.4'
-  - '@kubohiroya/turbowarp-camera-source@0.21.1'
-
+  - '@kubohiroya/turbowarp-camera-source@0.20.0 || 0.21.0 || 0.21.1 || 0.22.0'
+  - '@kubohiroya/vite-plugin-turbowarp-extension@0.8.0 || 0.9.0 || 0.10.0'
+  - '@kubohiroya/turbowarp-extension-data-editor@0.3.4 || 0.4.0 || 0.5.0'
   # The Teachable Machine and TensorFlow.js model packages still pin their peer
   # ranges to the TensorFlow.js 1.x/3.x era. TurboWarp Teachable Machine ships one TensorFlow.js
   # 4.22.0 module graph, so every package in the tree resolves to that one copy.

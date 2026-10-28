@@ -46,35 +46,51 @@ flowchart LR
 
 - 公開済みのTeachable Machineのポーズ・画像・音声モデルのURL（エディターのURLではなく、モデルフォルダーのURL）
 - カメラまたはマイクと、ブラウザーでのその使用許可
-- Teachable Machineのブラウザー実行環境とモデルファイルを取得するためのネットワーク接続
-- TurboWarpの**サンドボックスなしで実行**オプション。これはファイルから読み込んだ場合にのみ選べます（[導入方法](#導入方法)を参照）
+- モデルファイルを取得するためのネットワーク接続（軽量版ではライブラリーの取得にも使用）
+- TurboWarpの**サンドボックスなしで実行**オプション。これは**テキスト**または**ファイル**から読み込んだ場合に選べます（[導入方法](#導入方法)を参照）
 
 > [!IMPORTANT]
 > この機能拡張は、カメラ・マイク・ステージにアクセスするためサンドボックスなしで動作します。信頼できる提供元のコードだけを読み込んでください。またカメラAPIには、HTTPSや`localhost`などの安全なブラウザーコンテキストが必要です。
 
 ## 導入方法
 
-[`dist/tm.js`](dist/tm.js)をダウンロードし、TurboWarpのカスタム機能拡張ダイアログで**ファイル**タブを開いてそのファイルを選び、**サンドボックスなしで実行**を有効のままにしてください。
+標準のTurboWarp Editorで、次のどれか1つを読み込みます。
+
+| ファイル | 初期計算モード | 依存ライブラリーとWASMバイナリ |
+|---|---|---|
+| [`dist/teachable-machine-webgpu.js`](dist/teachable-machine-webgpu.js) | `webgpu` | すべて内包 |
+| [`dist/teachable-machine-wasm.js`](dist/teachable-machine-wasm.js) | `wasm` | すべて内包 |
+| [`dist/teachable-machine.js`](dist/teachable-machine.js) | `auto` | 必要時にネット取得する軽量版 |
+
+**テキスト**タブではファイルの全文を貼り付け、**サンドボックスなしで実行**を有効にします。
+**ファイル**タブから同じJavaScriptファイルを選んでも利用できます。
+
+内包版はTensorFlow.jsを1系統だけ含み、Teachable Machine Pose/Image、Speech Commands、
+WebGPU/WebGL/WASM/CPUの全バックエンド、3種類のWASMバイナリ、並列ワーカーを同梱します。
+初期方式以外への切り替えやフォールバックでも、ライブラリーやWASMバイナリの外部取得は発生しません。
+モデルファイルとPoseNetの重みは別途取得するため、完全オフラインのモデルパッケージではありません。
+実際の方式は`active compute backend`で確認できます。
 
 > [!IMPORTANT]
-> ダイアログの**URL**タブからは読み込めません。信頼されていないURLから読み込まれた機能拡張をTurboWarpは常にサンドボックス内で実行し、URLタブには**サンドボックスなしで実行**の選択肢自体がありません。この機能拡張はサンドボックス内では起動を拒否します。下のjsDelivrのリンクをURLタブに貼ると、ダイアログは何も表示しないまま待ち続け、ブラウザーのコンソールに`TM must run without the extension sandbox.`とだけ出ます。ファイルをダウンロードして**ファイル**タブから読み込んでください。
+> URLタブは信頼されていない拡張をサンドボックス化します。**テキスト**または**ファイル**で、
+> **サンドボックスなしで実行**を有効にしてください。
 
-ダウンロード先、および合成ランタイムが取得する成果物は、jsDelivr上のバージョン固定ビルドです。
+軽量版のバージョン固定CDN URLは、対応する成果物の公開後に利用できます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/teachable-machine.js
 ```
 
 合成ランタイムは、縮小済みの第三者バンドルを書き換えることなく、同じ検証済み成果物を読み込んだり同梱したりできます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/runtime.js
 ```
 
 公開済みパッケージを別のプロジェクトに追加するには次のようにします。
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.2
 ```
 
 ### 名前について
@@ -417,9 +433,14 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-`pnpm check`は、型検査・テスト・本番ビルド・生成ドキュメントの検証・Pagesのリンク検証・配布物の再現性・npmパッケージのドライランをまとめて実行します。ビルドは`dist/tm.js`・`dist/composition.js`・`dist/runtime.js`・`dist/posenet.js`と、`dist/posenet/`以下の3つの生のPoseNetモデル資産を生成します。
+`pnpm check`は、型検査・テスト・本番ビルド・生成ドキュメントの検証・Pagesのリンク検証・配布物の再現性・npmパッケージのドライランをまとめて実行します。ビルドは`dist/teachable-machine.js`・`dist/teachable-machine-webgpu.js`・`dist/teachable-machine-wasm.js`・`dist/composition.js`・`dist/runtime.js`・`dist/posenet.js`と、`dist/posenet/`以下の3つの生のPoseNetモデル資産を生成します。
 
 [英語版README](README.md#blocks)のブロック一覧は`src/block-definitions.json`から`pnpm docs`で生成されます。生成された節ではなく定義のほうを編集してください。リリースの基準は`package.json`のバージョンです。実行時のレポーターはそこに`-typescript`を付けた値を返し、リリース整合性チェックが、生成されたバンドル・READMEのバージョン固定の例・Pagesのバッジ・リリースタグをその値と揃えます。
+
+### 標準Editorでの検証
+
+WebGPU版・WASM版をテキストとファイルから読み込む4通りの認識を確認しました。
+[検証条件・再実行手順](docs/standalone-validation.ja.md)を参照してください。
 
 ### npmへの公開
 
@@ -427,7 +448,9 @@ npmへの公開には、長期間有効な書き込みトークンではなくGi
 
 ## 外部ライブラリー
 
-バージョン固定の`dist/runtime.js`は、TensorFlow.js 4.22.0、Teachable Machine Pose 0.8.6、Teachable Machine Image 0.8.5、TensorFlow.js Speech Commands 0.5.4、PoseNet 2.2.2を、1つの検証済みモジュールグラフとして同梱しています。ランタイムが注入されない場合、標準の機能拡張はこの単一の成果物をjsDelivrから読み込みます。任意の`dist/backend-wasm.js`と`dist/backend-webgpu.js`は、その実行環境がすでに公開したインスタンスに対してTensorFlow.jsを解決するので、1つのページでTensorFlow.jsのコアが二重になることはありません。`dist/wasm/`以下のWebAssemblyバイナリーと、`dist/posenet/`以下の固定オフラインPoseNetモデルデータは、元のバイナリーファイルのまま配布されます。
+バージョン固定の`dist/runtime.js`は、TensorFlow.js 4.22.0、Teachable Machine Pose 0.8.6、Teachable Machine Image 0.8.5、TensorFlow.js Speech Commands 0.5.4、PoseNet 2.2.2を、1つの検証済みモジュールグラフとして同梱しています。ランタイムが注入されない場合、軽量版はこの単一の成果物をjsDelivrから読み込みます。任意の`dist/backend-wasm.js`と`dist/backend-webgpu.js`は、その実行環境がすでに公開したインスタンスに対してTensorFlow.jsを解決するので、1つのページでTensorFlow.jsのコアが二重になることはありません。`dist/wasm/`以下のWebAssemblyバイナリーと、`dist/posenet/`以下の固定オフラインPoseNetモデルデータは、元のバイナリーファイルのまま配布されます。
+
+内包版は上記のライブラリー・バックエンド・WASMバイナリと、第三者ライセンス全文をJavaScript内に含みます。
 
 第三者ライセンスは[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)にまとめてあります。
 

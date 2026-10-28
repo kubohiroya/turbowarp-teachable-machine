@@ -2,7 +2,7 @@
   "baseURL": "https://kubohiroya.github.io/turbowarp-teachable-machine/",
   "extension": {
     "id": "kubohiroyatm",
-    "bundle": "dist/tm.js",
+    "bundle": "dist/teachable-machine.js",
     "unsandboxed": true
   },
   "assets": [

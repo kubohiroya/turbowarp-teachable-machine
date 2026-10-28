@@ -43,12 +43,11 @@ runtime libraries and the published model are fetched.
 
 ## Requirements
 
-- A published Teachable Machine pose, image, or audio model URL — the model folder URL, not the
-  editor URL.
-- A camera or microphone, and browser permission to use it.
-- Network access for the reviewed Teachable Machine browser runtime and the model files.
-- TurboWarp's **Run without sandbox** option, which only exists when the extension is loaded from a
-  file. See [Installation](#installation).
+- a published Teachable Machine Pose, Image, or Audio model URL;
+- a camera or microphone and permission to use it in the browser;
+- network access for model files (and, for the lightweight build, runtime libraries);
+- TurboWarp's **Run without sandbox** option, which is only available when the extension is
+  loaded from **Text** or **Files** (see [Installation](#installation)).
 
 > [!IMPORTANT]
 > This extension is unsandboxed because it needs camera, microphone, and stage access. Load
@@ -57,33 +56,61 @@ runtime libraries and the published model are fetched.
 
 ## Installation
 
-Download [`dist/tm.js`](dist/tm.js). In TurboWarp's custom extension dialog, open the **Files** tab,
-select that file, and keep **Run without sandbox** enabled.
+Choose **one** of these files in a standard TurboWarp Editor:
+
+| File | Initial compute mode | Bundled dependencies |
+|---|---|---|
+| [`dist/teachable-machine-webgpu.js`](dist/teachable-machine-webgpu.js) | `webgpu` | All runtime libraries, all backends, and all WASM binaries |
+| [`dist/teachable-machine-wasm.js`](dist/teachable-machine-wasm.js) | `wasm` | All runtime libraries, all backends, and all WASM binaries |
+| [`dist/teachable-machine.js`](dist/teachable-machine.js) | `auto` | Lightweight loader; downloads runtime libraries and optional backends |
+
+For **Text**, copy the entire file into the custom extension dialog's **Text** tab,
+enable **Run without sandbox**, and load it. Alternatively, select the JavaScript file
+in the **Files** tab and enable the same option. A custom TurboWarp build is not required.
+
+The WebGPU and WASM files each contain one TensorFlow.js module graph, Teachable Machine
+Pose/Image, Speech Commands, WebGPU/WebGL/WASM/CPU kernels, all three WASM binaries as data
+URLs, and the WASM worker. They do not fetch JavaScript libraries, workers, or WASM binaries
+from a CDN. Both include every backend so fallback and later mode changes also work without
+fetching library assets. They differ only in the initial compute mode; load one variant per editor.
+
+These are not complete offline model bundles: your Teachable Machine model files are still
+loaded from the URL you specify, and pose recognition also loads the PoseNet model weights.
+Camera/microphone permissions and HTTPS or localhost are still required.
+
+Set `set compute mode to [webgpu]` or `[wasm]` before loading a model to change the requested
+backend. If it is unavailable or fails the convolution check, the extension falls back;
+`active compute backend` reports the actual backend, and `last error` explains a fallback.
 
 > [!IMPORTANT]
-> The dialog's **URL** tab cannot load this extension. TurboWarp always sandboxes an extension
-> loaded from an untrusted URL — the URL tab has no **Run without sandbox** option at all — and this
-> extension refuses to start sandboxed. Pasting the jsDelivr link below into the URL tab leaves the
-> dialog waiting with nothing on screen and only `TM must run without the extension sandbox.` in the
-> browser console. Download the file and use the **Files** tab.
+> The **URL** tab sandboxes untrusted extension URLs and cannot provide the access this extension
+> needs. Use **Text** or **Files** with **Run without sandbox** enabled.
 
-The download, and the artifact a composite runtime fetches, is the version-pinned build on jsDelivr:
+All extension distribution filenames use the `teachable-machine` prefix.
+Existing Scratch extension IDs, opcodes, and runtime API names remain compatible.
+
+The version-pinned lightweight build uses this CDN URL after publication:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/teachable-machine.js
 ```
 
-A composite runtime can load or embed the same reviewed artifact without rewriting a minified
-third-party bundle:
+The lightweight extension loads one reviewed browser runtime that contains one TensorFlow.js 4.22.0
+module graph together with Teachable Machine Pose 0.8.6, Teachable Machine Image 0.8.5, and
+TensorFlow.js Speech Commands 0.5.4. That runtime ships the WebGL and CPU kernels; the WebGPU and
+WebAssembly backends live in separate bundles next to it and are fetched only when a project uses
+them. See [Compute backends](#compute-backends).
+Composite runtimes can load or embed the same artifact without rewriting a minified third-party
+bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.2
 ```
 
 ### Names
@@ -958,14 +985,24 @@ pnpm check
 
 `pnpm check` runs type checking, tests, the production build, generated-documentation validation,
 Pages link validation, distribution reproducibility, and an npm package dry run. The build produces
-`dist/tm.js`, `dist/composition.js`, `dist/runtime.js`, `dist/posenet.js`, and the three raw PoseNet
-model assets under `dist/posenet/`.
+`dist/teachable-machine.js`, `dist/teachable-machine-webgpu.js`, `dist/teachable-machine-wasm.js`,
+`dist/composition.js`, `dist/runtime.js`, `dist/posenet.js`, and the three raw
+PoseNet model assets under `dist/posenet/`.
 
 The block reference above is generated from `src/block-definitions.json` by `pnpm docs`; edit the
 definitions, not the generated section. The version in `package.json` is the release source of
 truth: the runtime reporter appends `-typescript` to it, and the release consistency check keeps the
 generated bundles, the exact-version README examples, the Pages badges, and the release tag aligned
 with it.
+
+### Standalone editor validation
+
+The [standalone validation guide (Japanese)](docs/standalone-validation.ja.md) records the
+standard-editor model-recognition checks for both **Text** and **Files**, including WebGPU
+and multithreaded WASM. To repeat them against a dedicated Chrome profile with a fake camera,
+follow that guide and run `node scripts/check-standalone-editor.mjs`. This optional browser
+check requires network access to the editor and the public Pose model; its JSON report records
+the browser version and SHA-256 of each tested JavaScript file.
 
 ### npm publishing
 
@@ -981,11 +1018,14 @@ not add a write token to the repository.
 
 The version-pinned `dist/runtime.js` artifact bundles TensorFlow.js 4.22.0, Teachable Machine Pose
 0.8.6, Teachable Machine Image 0.8.5, TensorFlow.js Speech Commands 0.5.4, and PoseNet 2.2.2 in one
-reviewed module graph. The standalone extension loads that single artifact from jsDelivr when no
+reviewed module graph. The lightweight extension loads that single artifact from jsDelivr when no
 runtime is injected. The optional `dist/backend-wasm.js` and `dist/backend-webgpu.js` bundles
 resolve TensorFlow.js against the instance that runtime already published, so a page never ends up
 with two TensorFlow.js cores. The WebAssembly binaries under `dist/wasm/` and the fixed offline
 PoseNet model data under `dist/posenet/` are distributed as their original binary files.
+
+The self-contained WebGPU/WASM extensions also embed the runtime libraries, backend code,
+and WASM binaries in their JavaScript file, together with the complete third-party notice.
 
 Third-party licences are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

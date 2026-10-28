@@ -1,6 +1,6 @@
 export const extensionConfig = {
   id: 'kubohiroyatm',
-  slug: 'tm',
+  slug: 'teachable-machine',
   name: 'Teachable Machine',
   description: 'Use Teachable Machine pose, image, or audio models for recognition in TurboWarp.',
   author: 'Hiroya Kubo',

@@ -10,7 +10,7 @@
 //#region src/config.ts
 var extensionConfig = {
 	id: "kubohiroyatm",
-	slug: "tm",
+	slug: "teachable-machine",
 	name: "Teachable Machine",
 	description: "Use Teachable Machine pose, image, or audio models for recognition in TurboWarp.",
 	author: "Hiroya Kubo",
@@ -1240,7 +1240,7 @@ function confidenceMultiplier(value) {
 }
 var package_default = {
 	name: "@kubohiroya/turbowarp-teachable-machine",
-	version: "4.0.1",
+	version: "4.0.2",
 	description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
 	author: "Hiroya Kubo <hiroya@cuc.ac.jp>",
 	license: "MPL-2.0",
@@ -1264,8 +1264,10 @@ var package_default = {
 		"./dist/backend-wasm.js": "./dist/backend-wasm.js",
 		"./dist/backend-webgpu.js": "./dist/backend-webgpu.js",
 		"./runtime": "./dist/runtime.js",
-		"./dist/tm.js": "./dist/tm.js",
-		"./package.json": "./package.json"
+		"./dist/teachable-machine.js": "./dist/teachable-machine.js",
+		"./package.json": "./package.json",
+		"./dist/teachable-machine-webgpu.js": "./dist/teachable-machine-webgpu.js",
+		"./dist/teachable-machine-wasm.js": "./dist/teachable-machine-wasm.js"
 	},
 	type: "module",
 	files: [
@@ -1278,8 +1280,8 @@ var package_default = {
 		"schemas/",
 		"docs/fixed-input-editors.ja.md"
 	],
-	unpkg: "./dist/tm.js",
-	jsdelivr: "./dist/tm.js",
+	unpkg: "./dist/teachable-machine.js",
+	jsdelivr: "./dist/teachable-machine.js",
 	publishConfig: {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
@@ -1289,7 +1291,7 @@ var package_default = {
 	scripts: {
 		"dev": "vite build --watch",
 		"typecheck": "tsc --noEmit",
-		"build": "pnpm build:extension && pnpm build:composition && pnpm build:runtime && pnpm build:backends && pnpm build:posenet && pnpm build:notices && pnpm build:types",
+		"build": "pnpm build:extension && pnpm build:standalone && pnpm build:composition && pnpm build:runtime && pnpm build:backends && pnpm build:posenet && pnpm build:notices && pnpm build:types",
 		"build:extension": "vite build",
 		"build:composition": "vite build --config vite.composition.config.ts",
 		"build:runtime": "vite build --config vite.runtime.config.ts",
@@ -1309,7 +1311,8 @@ var package_default = {
 		"pack:check": "npm pack --dry-run --ignore-scripts",
 		"release:check": "npm publish --dry-run --access public --tag latest",
 		"check": "npm run typecheck && npm run test && npm run build && npm run types:composition:check && npm run types:posenet:check && npm run docs:check && npm run docs:pages:check && npm run release:consistency:check && npm run check:dist && npm run archive:check && npm run pack:check",
-		"prepack": "npm run build && npm run release:consistency:check"
+		"prepack": "npm run build && npm run release:consistency:check",
+		"build:standalone": "vite build --config vite.standalone.config.ts --mode webgpu && vite build --config vite.standalone.config.ts --mode wasm"
 	},
 	devDependencies: {
 		"@kubohiroya/turbowarp-camera-source": "^0.21.1",
@@ -2929,11 +2932,19 @@ var TMExtension = class {
 	}
 };
 //#endregion
+//#region src/register-extension.ts
+function requireUnsandboxed() {
+	if (!Scratch.extensions.unsandboxed) throw new Error("Teachable Machine must run without the extension sandbox. In TurboWarp's custom extension dialog, paste the JavaScript into the Text tab or load teachable-machine.js from the Files tab with \"Run without sandbox\" enabled.");
+}
+function registerExtension(dependencies = {}) {
+	requireUnsandboxed();
+	const extension = new TMExtension({}, dependencies);
+	Scratch.extensions.register(extension);
+	if (Scratch.vm?.runtime) Scratch.vm.runtime.ext_kubohiroyatm = extension;
+}
+//#endregion
 //#region src/index.ts
-if (!Scratch.extensions.unsandboxed) throw new Error("TM must run without the extension sandbox. In TurboWarp's custom extension dialog, load the downloaded tm.js from the Files tab with \"Run without sandbox\" enabled; a URL pasted into the URL tab is always sandboxed.");
-var extension = new TMExtension();
-Scratch.extensions.register(extension);
-if (Scratch.vm?.runtime) Scratch.vm.runtime.ext_kubohiroyatm = extension;
+registerExtension();
 //#endregion
 
 })(Scratch);

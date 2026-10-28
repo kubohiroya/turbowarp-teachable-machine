@@ -98,7 +98,7 @@
           <p class="eyebrow">クイックスタート</p>
           <h2 id="quick-start-title">モデルから動きまで、4ステップ</h2>
         </div>
-        <p>公開済みの Teachable Machine Pose、Image、Audioモデル、対応するカメラまたはマイク権限、ネットワーク接続が必要です。ダウンロードした <code>tm.js</code> をカスタム拡張機能ダイアログの<strong>Files</strong>タブから、<strong>サンドボックス化せずに実行する</strong>を有効にして読み込み、次の順番でブロックを置きます。</p>
+        <p>公開済みの Teachable Machine Pose、Image、Audioモデルと、対応するカメラまたはマイク権限が必要です。<code>teachable-machine-webgpu.js</code> または <code>teachable-machine-wasm.js</code> の全文をカスタム拡張機能の<strong>テキスト</strong>に貼り付け、<strong>サンドボックスなし</strong>を有効にして読み込みます。<strong>ファイル</strong>からの読み込みも可能です。モデルファイルの取得にはネットワーク接続が必要です。</p>
       </div>
 
       <div class="flow" aria-label="4ステップの準備手順">
@@ -134,7 +134,7 @@
 
       <aside class="note">
         <span class="note-icon" aria-hidden="true">!</span>
-        <p><strong>「Files」タブから、サンドボックス化せずに読み込んでください。</strong>カメラまたはマイク利用とステージ内プレビューには「サンドボックス化せずに実行する」が必要ですが、この選択肢はカスタム拡張機能ダイアログの<strong>Files</strong>タブにしかありません。<strong>URL</strong>タブは必ずサンドボックス化されるため、URL を貼ると画面に何も出ないままダイアログが待機し続け、ブラウザのコンソールに <code>TM must run without the extension sandbox.</code> だけが残ります。先に <code>tm.js</code> をダウンロードしてください。信頼できる拡張機能のコードだけを読み込んでください。</p>
+        <p><strong>「テキスト」または「ファイル」で、サンドボックスなしを有効にしてください。</strong>WebGPU版とWASM版は初期計算モードが異なり、どちらも依存ライブラリ・全バックエンド・WASMバイナリを内包します。どちらか1つを読み込んでください。モデルとPoseNetの重みは別途取得します。<code>teachable-machine.js</code> はライブラリもネット取得する軽量版です。要求した方式が使えなければ自動的に代替へ切り替わるため、<code>active compute backend</code>で実際の方式を確認できます。URLタブでは必要な権限を取得できません。信頼できる拡張機能だけを読み込んでください。</p>
       </aside>
     </section>
 
@@ -354,7 +354,7 @@
           <p class="eyebrow">トラブルシューティング</p>
           <h2 id="troubleshooting-title">期待した結果にならないとき</h2>
         </div>
-        <p>まず <code>last error</code> を確認してください。設定時の失敗は、権限、間違ったモデル URL、ネットワーク制限、サンドボックス内での読み込みが主な原因です。サンドボックスで読み込むとエディタには何も出ず、ダイアログが待機したままで、ブラウザのコンソールに <code>TM must run without the extension sandbox.</code> だけが出ます。<strong>URL</strong>タブではなく<strong>Files</strong>タブからファイルを読み込んでください。</p>
+        <p>まず <code>last error</code> を確認してください。設定時の失敗は、権限、間違ったモデル URL、ネットワーク制限、サンドボックス内での読み込みが主な原因です。サンドボックスで読み込むとエディタには何も出ず、ダイアログが待機したままで、ブラウザのコンソールに <code>Teachable Machine must run without the extension sandbox.</code> だけが出ます。<strong>テキスト</strong>または<strong>ファイル</strong>で、<strong>サンドボックスなし</strong>を有効にして読み込んでください。</p>
         <p><code>start camera</code> にはページへの操作が一度必要です。ユーザー操作のないページでは <code>video.play()</code> が拒否され、<code>NotAllowedError: play() failed because the user didn’t interact with the document first.</code> となります。緑の旗のクリックは操作として数えられるので通常のプロジェクトは問題ありませんが、自動で開始するプロジェクトはボタン押下を待つ必要があります。</p>
       </div>
 

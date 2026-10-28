@@ -1,6 +1,7 @@
 # Third-party notices
 
-The reviewed browser runtime (`dist/runtime.js`), the optional compute backend
+The self-contained extensions (`dist/teachable-machine-webgpu.js` and
+`dist/teachable-machine-wasm.js`), the reviewed browser runtime (`dist/runtime.js`), the optional compute backend
 bundles (`dist/backend-wasm.js`, `dist/backend-webgpu.js`, `dist/wasm/`), and the
 fixed offline PoseNet model supply (`dist/posenet/`) include the following
 software and model data:

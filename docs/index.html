@@ -108,7 +108,7 @@
           <p class="eyebrow">Quick start</p>
           <h2 id="quick-start-title">From model to motion in four steps</h2>
         </div>
-        <p>You need a published Teachable Machine Pose, Image, or Audio model, the matching camera or microphone permission, and network access. Load the downloaded <code>tm.js</code> from the custom extension dialog’s <strong>Files</strong> tab with <strong>Run without sandbox</strong> enabled, then place these blocks in order.</p>
+        <p>Use a published Teachable Machine Pose, Image, or Audio model and allow camera or microphone access. Paste all of <code>teachable-machine-webgpu.js</code> or <code>teachable-machine-wasm.js</code> into the custom extension dialog’s <strong>Text</strong> tab and enable <strong>Run without sandbox</strong>. The <strong>Files</strong> tab also works. Network access is still needed for model files.</p>
       </div>
 
       <div class="flow" aria-label="Four-step setup flow">
@@ -144,7 +144,7 @@
 
       <aside class="note">
         <span class="note-icon" aria-hidden="true">!</span>
-        <p><strong>Load it unsandboxed, from the Files tab.</strong> Camera or microphone access and stage preview integration require TurboWarp’s “Run without sandbox” option, which only the custom extension dialog’s <strong>Files</strong> tab offers. The <strong>URL</strong> tab always sandboxes the extension, so pasting a link there leaves the dialog waiting with no message on screen and only <code>TM must run without the extension sandbox.</code> in the browser console. Download <code>tm.js</code> first. Only load extension code you trust.</p>
+        <p><strong>Enable Run without sandbox in Text or Files.</strong> The WebGPU and WASM builds differ in their initial compute mode; each embeds the libraries, all backends, and WASM binaries. Load one variant. Model files and PoseNet weights are fetched separately. <code>teachable-machine.js</code> is the lightweight build that also fetches libraries. If a requested backend is unusable, fallback is automatic; check <code>active compute backend</code> for the actual backend. The URL tab cannot provide the required access. Only load code you trust.</p>
       </aside>
     </section>
 
@@ -364,7 +364,7 @@
           <p class="eyebrow">Troubleshooting</p>
           <h2 id="troubleshooting-title">When the result is not what you expect</h2>
         </div>
-        <p>Check <code>last error</code> first. Most setup failures come from permissions, an incorrect model URL, blocked network requests, or loading the extension in the sandbox. A sandboxed load is silent in the editor: the dialog keeps waiting and only the browser console shows <code>TM must run without the extension sandbox.</code> Load the file from the <strong>Files</strong> tab, never from the <strong>URL</strong> tab.</p>
+        <p>Check <code>last error</code> first. Most setup failures come from permissions, an incorrect model URL, blocked network requests, or loading the extension in the sandbox. A sandboxed load is silent in the editor: the dialog keeps waiting and only the browser console shows <code>Teachable Machine must run without the extension sandbox.</code> Load the code from <strong>Text</strong> or <strong>Files</strong> with <strong>Run without sandbox</strong> enabled.</p>
         <p><code>start camera</code> also needs the page to have been interacted with once. Browsers refuse <code>video.play()</code> without user activation, reported as <code>NotAllowedError: play() failed because the user didn’t interact with the document first.</code> Clicking the green flag counts, so an ordinary project is fine; a project that starts on its own must wait for a button press.</p>
       </div>
 

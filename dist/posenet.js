@@ -24,8 +24,10 @@ var package_default = {
 		"./dist/backend-wasm.js": "./dist/backend-wasm.js",
 		"./dist/backend-webgpu.js": "./dist/backend-webgpu.js",
 		"./runtime": "./dist/runtime.js",
-		"./dist/tm.js": "./dist/tm.js",
-		"./package.json": "./package.json"
+		"./dist/teachable-machine.js": "./dist/teachable-machine.js",
+		"./package.json": "./package.json",
+		"./dist/teachable-machine-webgpu.js": "./dist/teachable-machine-webgpu.js",
+		"./dist/teachable-machine-wasm.js": "./dist/teachable-machine-wasm.js"
 	},
 	type: "module",
 	files: [
@@ -38,8 +40,8 @@ var package_default = {
 		"schemas/",
 		"docs/fixed-input-editors.ja.md"
 	],
-	unpkg: "./dist/tm.js",
-	jsdelivr: "./dist/tm.js",
+	unpkg: "./dist/teachable-machine.js",
+	jsdelivr: "./dist/teachable-machine.js",
 	publishConfig: {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
@@ -49,7 +51,7 @@ var package_default = {
 	scripts: {
 		"dev": "vite build --watch",
 		"typecheck": "tsc --noEmit",
-		"build": "pnpm build:extension && pnpm build:composition && pnpm build:runtime && pnpm build:backends && pnpm build:posenet && pnpm build:notices && pnpm build:types",
+		"build": "pnpm build:extension && pnpm build:standalone && pnpm build:composition && pnpm build:runtime && pnpm build:backends && pnpm build:posenet && pnpm build:notices && pnpm build:types",
 		"build:extension": "vite build",
 		"build:composition": "vite build --config vite.composition.config.ts",
 		"build:runtime": "vite build --config vite.runtime.config.ts",
@@ -69,7 +71,8 @@ var package_default = {
 		"pack:check": "npm pack --dry-run --ignore-scripts",
 		"release:check": "npm publish --dry-run --access public --tag latest",
 		"check": "npm run typecheck && npm run test && npm run build && npm run types:composition:check && npm run types:posenet:check && npm run docs:check && npm run docs:pages:check && npm run release:consistency:check && npm run check:dist && npm run archive:check && npm run pack:check",
-		"prepack": "npm run build && npm run release:consistency:check"
+		"prepack": "npm run build && npm run release:consistency:check",
+		"build:standalone": "vite build --config vite.standalone.config.ts --mode webgpu && vite build --config vite.standalone.config.ts --mode wasm"
 	},
 	devDependencies: {
 		"@kubohiroya/turbowarp-camera-source": "^0.21.1",

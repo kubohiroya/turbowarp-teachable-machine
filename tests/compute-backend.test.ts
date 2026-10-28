@@ -154,6 +154,30 @@ function tensorFlowDouble(overrides: Partial<ComputeTensorFlowApi> = {}) {
 }
 
 describe('createComputeRuntime', () => {
+  it('preserves embedded WASM binary URLs across backend changes', async () => {
+    const {api} = tensorFlowDouble();
+    const paths = {
+      'tfjs-backend-wasm.wasm': 'data:application/octet-stream;base64,AA==',
+      'tfjs-backend-wasm-simd.wasm': 'data:application/octet-stream;base64,AQ==',
+      'tfjs-backend-wasm-threaded-simd.wasm': 'data:application/octet-stream;base64,Ag=='
+    };
+    const setWasmPaths = vi.fn();
+    const runtime = createComputeRuntime({
+      tf: api,
+      loadBackend: async (backend) => backend === 'wasm' ? {setWasmPaths} : null,
+      wasmAssetBase: () => paths,
+      hasWebGPU: () => true,
+      hasWebAssembly: () => true
+    });
+
+    await runtime.select('wasm');
+    await runtime.select('webgpu');
+    await runtime.select('wasm');
+
+    expect(setWasmPaths).toHaveBeenCalledExactlyOnceWith(paths);
+    expect(runtime.getBackend()).toBe('wasm');
+  });
+
   it('pins the WebAssembly binaries exactly once and reports the selection', async () => {
     const {api} = tensorFlowDouble();
     const setWasmPaths = vi.fn();

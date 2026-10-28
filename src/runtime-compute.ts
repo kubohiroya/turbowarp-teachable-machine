@@ -24,15 +24,15 @@ export interface ComputeTensorFlowApi {
 
 /** Controls exported by an optional backend bundle once it has been loaded. */
 export interface ComputeBackendModule {
-  setWasmPaths?(prefix: string): void;
+  setWasmPaths?(paths: string | Record<string, string>): void;
 }
 
 export interface ComputeRuntimeDependencies {
   readonly tf: ComputeTensorFlowApi;
   /** Loads the optional bundle that registers `backend`, or resolves to `null`. */
   loadBackend(backend: ComputeBackendName): Promise<ComputeBackendModule | null>;
-  /** Absolute URL of the directory that holds the WebAssembly binaries. */
-  wasmAssetBase(): string;
+  /** Directory URL or an embedded data-URL map for all WebAssembly binaries. */
+  wasmAssetBase(): string | Record<string, string>;
   hasWebGPU(): boolean;
   hasWebAssembly(): boolean;
 }

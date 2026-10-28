@@ -54,7 +54,7 @@ flowchart LR
 
 ## 導入方法
 
-[`dist/tm.js`](dist/tm.js)をダウンロードし、TurboWarpのカスタム機能拡張ダイアログで**ファイル**タブを開いてそのファイルを選び、**サンドボックスなしで実行**を有効のままにしてください。
+[`dist/teachable-machine.js`](dist/teachable-machine.js)をダウンロードし、TurboWarpのカスタム機能拡張ダイアログで**ファイル**タブを開いてそのファイルを選び、**サンドボックスなしで実行**を有効のままにしてください。
 
 > [!IMPORTANT]
 > ダイアログの**URL**タブからは読み込めません。信頼されていないURLから読み込まれた機能拡張をTurboWarpは常にサンドボックス内で実行し、URLタブには**サンドボックスなしで実行**の選択肢自体がありません。この機能拡張はサンドボックス内では起動を拒否します。下のjsDelivrのリンクをURLタブに貼ると、ダイアログは何も表示しないまま待ち続け、ブラウザーのコンソールに`TM must run without the extension sandbox.`とだけ出ます。ファイルをダウンロードして**ファイル**タブから読み込んでください。
@@ -62,19 +62,19 @@ flowchart LR
 ダウンロード先、および合成ランタイムが取得する成果物は、jsDelivr上のバージョン固定ビルドです。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/teachable-machine.js
 ```
 
 合成ランタイムは、縮小済みの第三者バンドルを書き換えることなく、同じ検証済み成果物を読み込んだり同梱したりできます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/runtime.js
 ```
 
 公開済みパッケージを別のプロジェクトに追加するには次のようにします。
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.2
 ```
 
 ### 名前について
@@ -417,7 +417,7 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-`pnpm check`は、型検査・テスト・本番ビルド・生成ドキュメントの検証・Pagesのリンク検証・配布物の再現性・npmパッケージのドライランをまとめて実行します。ビルドは`dist/tm.js`・`dist/composition.js`・`dist/runtime.js`・`dist/posenet.js`と、`dist/posenet/`以下の3つの生のPoseNetモデル資産を生成します。
+`pnpm check`は、型検査・テスト・本番ビルド・生成ドキュメントの検証・Pagesのリンク検証・配布物の再現性・npmパッケージのドライランをまとめて実行します。ビルドは`dist/teachable-machine.js`・`dist/composition.js`・`dist/runtime.js`・`dist/posenet.js`と、`dist/posenet/`以下の3つの生のPoseNetモデル資産を生成します。
 
 [英語版README](README.md#blocks)のブロック一覧は`src/block-definitions.json`から`pnpm docs`で生成されます。生成された節ではなく定義のほうを編集してください。リリースの基準は`package.json`のバージョンです。実行時のレポーターはそこに`-typescript`を付けた値を返し、リリース整合性チェックが、生成されたバンドル・READMEのバージョン固定の例・Pagesのバッジ・リリースタグをその値と揃えます。
 

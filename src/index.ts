@@ -5,7 +5,7 @@ if (!Scratch.extensions.unsandboxed) {
   // failed load leaves no message in the editor, so the recovery path belongs here.
   throw new Error(
     'TM must run without the extension sandbox. In TurboWarp\'s custom extension ' +
-      'dialog, load the downloaded tm.js from the Files tab with "Run without ' +
+      'dialog, load the downloaded teachable-machine.js from the Files tab with "Run without ' +
       'sandbox" enabled; a URL pasted into the URL tab is always sandboxed.'
   );
 }

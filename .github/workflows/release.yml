@@ -76,7 +76,7 @@ jobs:
           existing="$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.assets[] | "\(.name)\t\(.digest)"')"
           shopt -s nullglob
           for file in "$NPM_ARCHIVE" \
-            dist/tm.js \
+            dist/teachable-machine.js \
             dist/composition.js \
             dist/runtime.js \
             dist/backend-wasm.js \

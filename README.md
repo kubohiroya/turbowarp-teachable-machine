@@ -57,7 +57,7 @@ runtime libraries and the published model are fetched.
 
 ## Installation
 
-Download [`dist/tm.js`](dist/tm.js). In TurboWarp's custom extension dialog, open the **Files** tab,
+Download [`dist/teachable-machine.js`](dist/teachable-machine.js). In TurboWarp's custom extension dialog, open the **Files** tab,
 select that file, and keep **Run without sandbox** enabled.
 
 > [!IMPORTANT]
@@ -70,20 +70,20 @@ select that file, and keep **Run without sandbox** enabled.
 The download, and the artifact a composite runtime fetches, is the version-pinned build on jsDelivr:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/tm.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/teachable-machine.js
 ```
 
 A composite runtime can load or embed the same reviewed artifact without rewriting a minified
 third-party bundle:
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.1/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/runtime.js
 ```
 
 To add the published package to another project:
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.1
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.2
 ```
 
 ### Names
@@ -958,7 +958,7 @@ pnpm check
 
 `pnpm check` runs type checking, tests, the production build, generated-documentation validation,
 Pages link validation, distribution reproducibility, and an npm package dry run. The build produces
-`dist/tm.js`, `dist/composition.js`, `dist/runtime.js`, `dist/posenet.js`, and the three raw PoseNet
+`dist/teachable-machine.js`, `dist/composition.js`, `dist/runtime.js`, `dist/posenet.js`, and the three raw PoseNet
 model assets under `dist/posenet/`.
 
 The block reference above is generated from `src/block-definitions.json` by `pnpm docs`; edit the

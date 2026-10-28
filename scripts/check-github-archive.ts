@@ -32,7 +32,7 @@ try {
     stdio: 'pipe'
   });
   for (const output of [
-    'dist/tm.js',
+    'dist/teachable-machine.js',
     'dist/composition.js',
     'dist/runtime.js',
     'dist/backend-wasm.js',

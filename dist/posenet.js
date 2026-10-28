@@ -1,6 +1,6 @@
 var package_default = {
 	name: "@kubohiroya/turbowarp-teachable-machine",
-	version: "4.0.1",
+	version: "4.0.2",
 	description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
 	author: "Hiroya Kubo <hiroya@cuc.ac.jp>",
 	license: "MPL-2.0",
@@ -24,7 +24,7 @@ var package_default = {
 		"./dist/backend-wasm.js": "./dist/backend-wasm.js",
 		"./dist/backend-webgpu.js": "./dist/backend-webgpu.js",
 		"./runtime": "./dist/runtime.js",
-		"./dist/tm.js": "./dist/tm.js",
+		"./dist/teachable-machine.js": "./dist/teachable-machine.js",
 		"./package.json": "./package.json"
 	},
 	type: "module",
@@ -38,8 +38,8 @@ var package_default = {
 		"schemas/",
 		"docs/fixed-input-editors.ja.md"
 	],
-	unpkg: "./dist/tm.js",
-	jsdelivr: "./dist/tm.js",
+	unpkg: "./dist/teachable-machine.js",
+	jsdelivr: "./dist/teachable-machine.js",
 	publishConfig: {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"

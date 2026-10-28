@@ -1,4 +1,4 @@
-import {readFile} from 'node:fs/promises';
+import {readFile, readdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import process from 'node:process';
 
@@ -21,6 +21,9 @@ interface PackageMetadata {
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+  exports?: Record<string, unknown>;
+  unpkg?: string;
+  jsdelivr?: string;
 }
 
 const packageMetadata = JSON.parse(await readFile('package.json', 'utf8')) as PackageMetadata;
@@ -29,6 +32,43 @@ const version = packageMetadata.version;
 const pinnedPackage = `${packageMetadata.name}@${version}`;
 const docsBrandName = 'Teachable Machine';
 const errors: string[] = [];
+
+const extensionBundlePath = './dist/teachable-machine.js';
+for (const field of ['unpkg', 'jsdelivr'] as const) {
+  if (packageMetadata[field] !== extensionBundlePath) {
+    errors.push(`package.json ${field} must point to ${extensionBundlePath}`);
+  }
+}
+if (packageMetadata.exports?.[extensionBundlePath] !== extensionBundlePath) {
+  errors.push(`package.json must export ${extensionBundlePath}`);
+}
+
+// Reject old artifact names in active entry points and every generated JavaScript bundle.
+const legacyExtensionFilename = /\b(?:tm|tmpose)\.js\b/u;
+const distributionSources = [
+  'package.json',
+  'README.md',
+  'README.ja.md',
+  'samples/manifest.json',
+  'docs/index.html',
+  'docs/ja/index.html',
+  '.github/workflows/ci.yml',
+  '.github/workflows/release.yml'
+];
+for (const entry of await readdir('dist', {withFileTypes: true})) {
+  if (entry.isFile() && entry.name.endsWith('.js')) {
+    if (legacyExtensionFilename.test(entry.name)) {
+      errors.push(`dist/${entry.name} must not be distributed under a legacy extension filename`);
+    }
+    distributionSources.push(`dist/${entry.name}`);
+  }
+}
+for (const path of distributionSources) {
+  if (legacyExtensionFilename.test(await readFile(path, 'utf8'))) {
+    errors.push(`${path} must not reference a legacy extension JavaScript filename`);
+  }
+}
+
 
 if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) {
   errors.push(`package.json contains an invalid version: ${version}`);
@@ -52,7 +92,7 @@ for (const path of ['docs/index.html', 'docs/ja/index.html']) {
   }
 }
 
-for (const path of ['dist/tm.js', 'dist/composition.js']) {
+for (const path of ['dist/teachable-machine.js', 'dist/composition.js']) {
   const source = await readFile(path, 'utf8');
   // Rollup emitted `const version = "x"`, Rolldown inlines it as `version: "x"`.
   // Assert the value is embedded, not one bundler's spelling of it.

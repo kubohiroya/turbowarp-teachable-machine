@@ -19,7 +19,7 @@ var extensionConfig = {
 	blockIconURI: `data:image/svg+xml,${encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 48 48\"><circle cx=\"24\" cy=\"15\" r=\"4\" fill=\"#4C97FF\"/><path d=\"M24 20v10M24 23l-7 4M24 23l7 4M24 30l-5 9M24 30l5 9\" fill=\"none\" stroke=\"#4C97FF\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M9 15V9h6M39 15V9h-6M9 33v6h6M39 33v6h-6\" fill=\"none\" stroke=\"#59C059\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>")}`
 };
 //#endregion
-//#region node_modules/.pnpm/@kubohiroya+turbowarp-extension-data-editor@0.4.0_react@18.3.1/node_modules/@kubohiroya/turbowarp-extension-data-editor/dist/fixed-input-schema.js
+//#region node_modules/.pnpm/@kubohiroya+turbowarp-extension-data-editor@0.5.0_react@18.3.1/node_modules/@kubohiroya/turbowarp-extension-data-editor/dist/fixed-input-schema.js
 var numberToken = /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?$/u;
 var invalidNumber = Object.freeze({
 	kind: "invalid",
@@ -1240,9 +1240,13 @@ function confidenceMultiplier(value) {
 }
 var package_default = {
 	name: "@kubohiroya/turbowarp-teachable-machine",
-	version: "4.0.2",
+	version: "4.1.0",
 	description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
-	author: "Hiroya Kubo <hiroya@cuc.ac.jp>",
+	author: {
+		"name": "Hiroya Kubo",
+		"email": "hiroya@cuc.ac.jp",
+		"url": "https://github.com/kubohiroya"
+	},
 	license: "MPL-2.0",
 	homepage: "https://github.com/kubohiroya/turbowarp-teachable-machine#readme",
 	repository: {
@@ -1315,8 +1319,8 @@ var package_default = {
 		"build:standalone": "vite build --config vite.standalone.config.ts --mode webgpu && vite build --config vite.standalone.config.ts --mode wasm"
 	},
 	devDependencies: {
-		"@kubohiroya/turbowarp-camera-source": "^0.21.1",
-		"@kubohiroya/vite-plugin-turbowarp-extension": "^0.9.0",
+		"@kubohiroya/turbowarp-camera-source": "^0.22.0",
+		"@kubohiroya/vite-plugin-turbowarp-extension": "^0.10.0",
 		"@teachablemachine/image": "0.8.5",
 		"@teachablemachine/pose": "0.8.6",
 		"@tensorflow-models/posenet": "2.2.2",
@@ -1328,7 +1332,7 @@ var package_default = {
 		"typescript": "^5.9.3",
 		"vite": "^8.2.2",
 		"vitest": "^4.0.14",
-		"@kubohiroya/turbowarp-extension-data-editor": "^0.4.0"
+		"@kubohiroya/turbowarp-extension-data-editor": "^0.5.0"
 	},
 	keywords: [
 		"turbowarp",

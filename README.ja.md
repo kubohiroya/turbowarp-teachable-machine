@@ -78,19 +78,19 @@ WebGPU/WebGL/WASM/CPUの全バックエンド、3種類のWASMバイナリ、並
 軽量版のバージョン固定CDN URLは、対応する成果物の公開後に利用できます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/teachable-machine.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.1.0/dist/teachable-machine.js
 ```
 
 合成ランタイムは、縮小済みの第三者バンドルを書き換えることなく、同じ検証済み成果物を読み込んだり同梱したりできます。
 
 ```text
-https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.0.2/dist/runtime.js
+https://cdn.jsdelivr.net/npm/@kubohiroya/turbowarp-teachable-machine@4.1.0/dist/runtime.js
 ```
 
 公開済みパッケージを別のプロジェクトに追加するには次のようにします。
 
 ```sh
-pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.0.2
+pnpm add --save-exact @kubohiroya/turbowarp-teachable-machine@4.1.0
 ```
 
 ### 名前について

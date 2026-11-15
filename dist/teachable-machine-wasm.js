@@ -66932,28 +66932,39 @@ var mHe = [
 	}
 ];
 function hHe(e) {
-	let t = typeof e == "object" && e ? e : {}, n, r = "", i = [], a = !1, o = () => {
-		t.vm?.runtime?.off?.("RUNTIME_DISPOSED", s);
+	let t = typeof e == "object" && e ? e : {}, n, r = "", i = [], a = !1, o = !1, s = [], c = () => {
+		t.vm?.runtime?.off?.("RUNTIME_DISPOSED", u), t.vm?.runtime?.off?.("PROJECT_LOADED", d);
 		for (let e of i.splice(0).reverse()) e();
 		n = void 0, r = "";
-	}, s = () => {
-		a = !0, o();
+	}, l = (e) => {
+		let a = t.gui?.blockEditors, o = [...new Set(e)].sort().join("\0");
+		if ((a !== n || o !== r) && (c(), a?.apiVersion === 1 && typeof a.registerFixedInputEditor == "function")) try {
+			for (let t of mHe) if (t.opcodes.every((t) => e.includes(t))) {
+				let e = a.registerFixedInputEditor.call(a, t);
+				if (typeof e != "function") throw TypeError("Invalid fixed registration cleanup.");
+				i.push(e);
+			}
+			n = a, r = o, t.vm?.runtime?.on?.("RUNTIME_DISPOSED", u);
+		} catch (e) {
+			throw c(), e;
+		}
+	}, u = () => {
+		c(), o = !0, t.vm?.runtime?.on?.("PROJECT_LOADED", d);
+	}, d = () => {
+		if (!a && o) {
+			o = !1;
+			try {
+				l(s);
+			} catch {}
+		}
 	};
 	return {
 		ensure(e) {
-			let c = t.gui?.blockEditors, l = [...new Set(e)].sort().join("\0");
-			if (!(a || c === n && l === r) && (o(), c?.apiVersion === 1 && typeof c.registerFixedInputEditor == "function")) try {
-				for (let t of mHe) if (t.opcodes.every((t) => e.includes(t))) {
-					let e = c.registerFixedInputEditor.call(c, t);
-					if (typeof e != "function") throw TypeError("Invalid fixed registration cleanup.");
-					i.push(e);
-				}
-				n = c, r = l, t.vm?.runtime?.on?.("RUNTIME_DISPOSED", s);
-			} catch (e) {
-				throw o(), e;
-			}
+			s = e, !(a || o) && l(e);
 		},
-		dispose: s
+		dispose: () => {
+			a = !0, o = !1, c();
+		}
 	};
 }
 var B9 = {

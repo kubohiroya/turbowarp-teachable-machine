@@ -79,6 +79,32 @@ describe('fixed owner contracts', () => {
     expect(() => fixedInputRegistration({}).ensure(opcodes)).not.toThrow();
     for (const host of [undefined, null, false]) {const absent = fixedInputRegistration(host);expect(() => absent.ensure(opcodes)).not.toThrow();expect(() => absent.dispose()).not.toThrow();}
   });
+  it('registers the same editors again after the next project loads, and the owner dispose is final', () => {
+    // Every project load disposes the runtime but keeps the extension loaded for the next project.
+    const listeners = new Map<string, Set<() => void>>();
+    const runtime = {
+      on: (event: string, listener: () => void) => {if (!listeners.has(event)) listeners.set(event, new Set()); listeners.get(event)!.add(listener);},
+      off: (event: string, listener: () => void) => {listeners.get(event)?.delete(listener);},
+      emit: (event: string) => {for (const listener of [...listeners.get(event) ?? []]) listener();},
+      count: () => [...listeners.values()].reduce((sum, set) => sum + set.size, 0)
+    };
+    const removes: ReturnType<typeof vi.fn>[] = [];
+    const register = vi.fn(() => {const remove = vi.fn(); removes.push(remove); return remove;});
+    const lifecycle = fixedInputRegistration({gui: {blockEditors: {apiVersion: 1, registerFixedInputEditor: register}}, vm: {runtime}});
+    const opcodes = fixedInputEditors.flatMap(o => o.opcodes);const n = fixedInputEditors.length;
+    lifecycle.ensure(opcodes); expect(register).toHaveBeenCalledTimes(n);
+    runtime.emit('RUNTIME_DISPOSED');
+    expect(removes.every(remove => remove.mock.calls.length === 1)).toBe(true);
+    lifecycle.ensure(opcodes); expect(register).toHaveBeenCalledTimes(n);
+    runtime.emit('PROJECT_LOADED'); expect(register).toHaveBeenCalledTimes(2 * n);
+    runtime.emit('PROJECT_LOADED'); lifecycle.ensure(opcodes); expect(register).toHaveBeenCalledTimes(2 * n);
+    expect(removes.slice(n).every(remove => remove.mock.calls.length === 0)).toBe(true);
+    runtime.emit('RUNTIME_DISPOSED'); runtime.emit('PROJECT_LOADED'); expect(register).toHaveBeenCalledTimes(3 * n);
+    lifecycle.dispose(); expect(removes.every(remove => remove.mock.calls.length === 1)).toBe(true);
+    expect(runtime.count()).toBe(0);
+    runtime.emit('RUNTIME_DISPOSED'); runtime.emit('PROJECT_LOADED'); lifecycle.ensure(opcodes);
+    expect(register).toHaveBeenCalledTimes(3 * n);
+  });
 });
 
 

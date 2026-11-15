@@ -656,43 +656,70 @@ var fixedInputEditors = [
 		bindings: [binding("isPoseWithThreshold", "THRESHOLD")]
 	}
 ];
-/** Register only currently declared opcodes; release obsolete feature-flag scopes. */
+/**
+* Register only currently declared opcodes; release obsolete feature-flag scopes.
+* Loading a project disposes the runtime, which releases the registrations, but the extension
+* stays loaded for the next project: they are registered again once that project has loaded.
+* Only the owner's dispose is final.
+*/
 function fixedInputRegistration(scratch) {
 	const host = typeof scratch === "object" && scratch !== null ? scratch : {};
 	let active;
 	let activeOpcodes = "";
 	const removers = [];
 	let disposed = false;
+	let released = false;
+	let requested = [];
 	const dispose = () => {
-		host.vm?.runtime?.off?.("RUNTIME_DISPOSED", shutdown);
+		host.vm?.runtime?.off?.("RUNTIME_DISPOSED", release);
+		host.vm?.runtime?.off?.("PROJECT_LOADED", restore);
 		for (const remove of removers.splice(0).reverse()) remove();
 		active = void 0;
 		activeOpcodes = "";
 	};
+	const register = (opcodes) => {
+		const api = host.gui?.blockEditors;
+		const signature = [...new Set(opcodes)].sort().join("\0");
+		if (api === active && signature === activeOpcodes) return;
+		dispose();
+		if (api?.apiVersion !== 1 || typeof api.registerFixedInputEditor !== "function") return;
+		try {
+			for (const definition of fixedInputEditors) if (definition.opcodes.every((opcode) => opcodes.includes(opcode))) {
+				const remove = api.registerFixedInputEditor.call(api, definition);
+				if (typeof remove !== "function") throw new TypeError("Invalid fixed registration cleanup.");
+				removers.push(remove);
+			}
+			active = api;
+			activeOpcodes = signature;
+			host.vm?.runtime?.on?.("RUNTIME_DISPOSED", release);
+		} catch (error) {
+			dispose();
+			throw error;
+		}
+	};
+	/** The runtime of this project is gone; wait for the next project before registering again. */
+	const release = () => {
+		dispose();
+		released = true;
+		host.vm?.runtime?.on?.("PROJECT_LOADED", restore);
+	};
+	const restore = () => {
+		if (disposed || !released) return;
+		released = false;
+		try {
+			register(requested);
+		} catch {}
+	};
 	const shutdown = () => {
 		disposed = true;
+		released = false;
 		dispose();
 	};
 	return {
 		ensure(opcodes) {
-			const api = host.gui?.blockEditors;
-			const signature = [...new Set(opcodes)].sort().join("\0");
-			if (disposed || api === active && signature === activeOpcodes) return;
-			dispose();
-			if (api?.apiVersion !== 1 || typeof api.registerFixedInputEditor !== "function") return;
-			try {
-				for (const definition of fixedInputEditors) if (definition.opcodes.every((opcode) => opcodes.includes(opcode))) {
-					const remove = api.registerFixedInputEditor.call(api, definition);
-					if (typeof remove !== "function") throw new TypeError("Invalid fixed registration cleanup.");
-					removers.push(remove);
-				}
-				active = api;
-				activeOpcodes = signature;
-				host.vm?.runtime?.on?.("RUNTIME_DISPOSED", shutdown);
-			} catch (error) {
-				dispose();
-				throw error;
-			}
+			requested = opcodes;
+			if (disposed || released) return;
+			register(opcodes);
 		},
 		dispose: shutdown
 	};

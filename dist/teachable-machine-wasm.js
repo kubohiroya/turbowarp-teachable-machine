@@ -65938,7 +65938,7 @@ var y9 = o((() => {})), BVe = /* @__PURE__ */ s(((e) => {
 	e.drawKeypoints = r.drawKeypoints, e.drawSkeleton = r.drawSkeleton, e.drawPoint = r.drawPoint, e.drawSegment = r.drawSegment, e.version = x9().version;
 })), w9 = /* @__PURE__ */ u(VVe(), 1), T9 = /* @__PURE__ */ u(KVe(), 1), E9 = {
 	name: "@kubohiroya/turbowarp-teachable-machine",
-	version: "4.2.0",
+	version: "4.2.1",
 	description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
 	author: {
 		name: "Hiroya Kubo",

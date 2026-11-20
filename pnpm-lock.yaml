@@ -18,11 +18,11 @@ importers:
   .:
     devDependencies:
       '@kubohiroya/turbowarp-camera-source':
-        specifier: ^0.23.0
-        version: 0.23.0
+        specifier: ^0.24.0
+        version: 0.24.0
       '@kubohiroya/turbowarp-extension-data-editor':
-        specifier: ^0.8.1
-        version: 0.8.1(react@18.3.1)
+        specifier: ^0.11.0
+        version: 0.11.0(react@18.3.1)
       '@kubohiroya/vite-plugin-turbowarp-extension':
         specifier: ^0.11.0
         version: 0.11.0(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.1)(yaml@2.9.1))
@@ -221,12 +221,12 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@kubohiroya/turbowarp-camera-source@0.23.0':
-    resolution: {integrity: sha512-Xg7z7k/KZGUlozAxCmUjrKVeFDLdmtaikt9Rc5e7DQ3in8xqHcRCFdSzn+XgK7bBlx6ODrfdzj3j1575KElh7A==}
+  '@kubohiroya/turbowarp-camera-source@0.24.0':
+    resolution: {integrity: sha512-vzZ5pdQedCGXxMoK3rKbgjdZkTZmFem/GBdztS2C2D22uge7F/YUKa5ojpV6AGN2gX/XS4w9fpmCfxeszduDJA==}
     engines: {node: '>=24'}
 
-  '@kubohiroya/turbowarp-extension-data-editor@0.8.1':
-    resolution: {integrity: sha512-lNPLj2JxG02/OPVPOzGofToGL2m6XGZre1cE0tsJ6t8CEfi+FFmYVmdURt/k3IvUUVqViDxMiiJhcrbXwkzY5Q==}
+  '@kubohiroya/turbowarp-extension-data-editor@0.11.0':
+    resolution: {integrity: sha512-x1ttE4cvsKfKJz7RNDt4/hK/9pk+GEHDm4oR9Y6t0qY6nRDXatAl3ybPJhU7Y702tCYhmtn9Fo46hjYM6OS9dA==}
     engines: {node: '>=24'}
     peerDependencies:
       react: ^16.14.0 || ^17 || ^18
@@ -1162,9 +1162,9 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@kubohiroya/turbowarp-camera-source@0.23.0': {}
+  '@kubohiroya/turbowarp-camera-source@0.24.0': {}
 
-  '@kubohiroya/turbowarp-extension-data-editor@0.8.1(react@18.3.1)':
+  '@kubohiroya/turbowarp-extension-data-editor@0.11.0(react@18.3.1)':
     dependencies:
       '@rjsf/core': 5.24.13(@rjsf/utils@5.24.13(react@18.3.1))(react@18.3.1)
       '@rjsf/utils': 5.24.13(react@18.3.1)

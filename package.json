@@ -1,6 +1,6 @@
 {
   "name": "@kubohiroya/turbowarp-teachable-machine",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "description": "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
   "author": {
     "name": "Hiroya Kubo",
@@ -107,5 +107,58 @@
     "audio",
     "camera",
     "teachable-machine"
-  ]
+  ],
+  "turbowarpExtension": {
+    "resourceDeclaration": {
+      "schemaVersion": 1,
+      "resources": [
+        {
+          "type": "camera",
+          "usage": "conditional",
+          "purpose": {
+            "en": "Read frames for image or pose recognition",
+            "ja": "画像認識・姿勢認識用に映像を読み取る"
+          },
+          "condition": {
+            "en": "In image or pose recognition mode",
+            "ja": "画像・姿勢認識モードを使う場合"
+          },
+          "via": [
+            "@kubohiroya/turbowarp-camera-source"
+          ]
+        },
+        {
+          "type": "microphone",
+          "usage": "conditional",
+          "purpose": {
+            "en": "Read audio segments for sound recognition",
+            "ja": "音声認識用にマイクの音声を読み取る"
+          },
+          "condition": {
+            "en": "In audio recognition mode",
+            "ja": "音声認識モードを使う場合"
+          }
+        },
+        {
+          "type": "network",
+          "usage": "conditional",
+          "purpose": {
+            "en": "Download recognition models and runtime libraries",
+            "ja": "認識モデルと実行ライブラリーを取得する"
+          },
+          "condition": {
+            "en": "When loading a model URL or a runtime not already supplied by the host",
+            "ja": "モデルURLを読み込む場合、またはホストが未提供の実行ライブラリーを読み込む場合"
+          },
+          "data": {
+            "direction": "download",
+            "content": {
+              "en": "Model files and runtime libraries; camera frames and microphone audio are not uploaded by this recognition path",
+              "ja": "モデルファイルと実行ライブラリー。この認識経路はカメラ映像・マイク音声をアップロードしない"
+            }
+          }
+        }
+      ]
+    }
+  }
 }

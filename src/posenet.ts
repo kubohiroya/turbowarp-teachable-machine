@@ -1,4 +1,4 @@
-import packageMetadata from '../package.json' with {type: 'json'};
+import {packageMetadata} from './package-metadata.js';
 
 export type PoseNetBundleFileInput = Readonly<{
   path: string;

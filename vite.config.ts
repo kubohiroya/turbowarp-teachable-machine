@@ -2,8 +2,10 @@ import {normalizeBundleIndentation} from './vite-indent-plugin.js';
 import {configDefaults, defineConfig} from 'vitest/config';
 import {turboWarpExtension} from '@kubohiroya/vite-plugin-turbowarp-extension';
 import {extensionConfig} from './src/config.js';
+import {packageMetadataDefine} from './package-metadata.config.js';
 
 export default defineConfig({
+  define: packageMetadataDefine,
   plugins: [
     normalizeBundleIndentation(),
     turboWarpExtension({

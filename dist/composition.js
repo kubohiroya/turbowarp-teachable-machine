@@ -1224,161 +1224,19 @@ function confidenceMultiplier(value) {
 	if (!Number.isFinite(confidence)) return 0;
 	return Math.max(0, Math.min(1, confidence));
 }
-var package_default = {
-	name: "@kubohiroya/turbowarp-teachable-machine",
-	version: "4.4.1",
-	description: "A TurboWarp extension for recognition using Teachable Machine pose, image, and audio models.",
-	author: {
-		"name": "Hiroya Kubo",
-		"email": "hiroya@cuc.ac.jp",
-		"url": "https://github.com/kubohiroya"
-	},
-	license: "MPL-2.0",
-	homepage: "https://github.com/kubohiroya/turbowarp-teachable-machine#readme",
-	repository: {
-		"type": "git",
-		"url": "git+https://github.com/kubohiroya/turbowarp-teachable-machine.git"
-	},
-	bugs: { "url": "https://github.com/kubohiroya/turbowarp-teachable-machine/issues" },
-	exports: {
-		"./composition": {
-			"types": "./dist/types/composition.d.ts",
-			"import": "./dist/composition.js"
-		},
-		"./posenet": {
-			"types": "./dist/types/posenet.d.ts",
-			"import": "./dist/posenet.js"
-		},
-		"./posenet-assets/*": "./dist/posenet/mobilenet-v1-075-stride16/*",
-		"./wasm-assets/*": "./dist/wasm/*",
-		"./dist/backend-wasm.js": "./dist/backend-wasm.js",
-		"./dist/backend-webgpu.js": "./dist/backend-webgpu.js",
-		"./runtime": "./dist/runtime.js",
-		"./dist/teachable-machine.js": "./dist/teachable-machine.js",
-		"./package.json": "./package.json",
-		"./dist/teachable-machine-webgpu.js": "./dist/teachable-machine-webgpu.js",
-		"./dist/teachable-machine-wasm.js": "./dist/teachable-machine-wasm.js"
-	},
-	type: "module",
-	files: [
-		"assets/block-icon.svg",
-		"dist/",
-		"README.md",
-		"README.ja.md",
-		"LICENSE",
-		"THIRD_PARTY_NOTICES.md",
-		"schemas/",
-		"docs/fixed-input-editors.ja.md"
-	],
-	unpkg: "./dist/teachable-machine.js",
-	jsdelivr: "./dist/teachable-machine.js",
-	publishConfig: {
-		"access": "public",
-		"registry": "https://registry.npmjs.org/"
-	},
-	packageManager: "pnpm@11.28.8",
-	engines: { "node": ">=24" },
-	scripts: {
-		"dev": "vite build --watch",
-		"typecheck": "tsc --noEmit",
-		"build": "pnpm build:extension && pnpm build:standalone && pnpm build:composition && pnpm build:runtime && pnpm build:backends && pnpm build:posenet && pnpm build:notices && pnpm build:types",
-		"build:extension": "vite build",
-		"build:composition": "vite build --config vite.composition.config.ts",
-		"build:runtime": "vite build --config vite.runtime.config.ts",
-		"build:backends": "vite build --config vite.backend-wasm.config.ts && vite build --config vite.backend-webgpu.config.ts && node scripts/copy-wasm-assets.ts",
-		"build:posenet": "vite build --config vite.posenet.config.ts && node scripts/copy-posenet-assets.ts",
-		"build:notices": "node scripts/copy-third-party-notices.ts",
-		"build:types": "tsc --project tsconfig.build.json",
-		"types:composition:check": "tsc --project tsconfig.composition-consumer.json",
-		"types:posenet:check": "tsc --project tsconfig.posenet-consumer.json",
-		"test": "vitest run",
-		"docs": "node scripts/generate-readme.ts",
-		"docs:check": "npm run docs && git diff --exit-code -- README.md",
-		"docs:pages:check": "node scripts/check-pages.ts",
-		"release:consistency:check": "node scripts/check-release-consistency.ts",
-		"check:dist": "npm run build && git diff --exit-code -- dist",
-		"archive:check": "node scripts/check-github-archive.ts",
-		"pack:check": "npm pack --dry-run --ignore-scripts",
-		"release:check": "npm publish --dry-run --access public --tag latest",
-		"check": "npm run typecheck && npm run test && npm run build && npm run types:composition:check && npm run types:posenet:check && npm run docs:check && npm run docs:pages:check && npm run release:consistency:check && npm run check:dist && npm run archive:check && npm run pack:check",
-		"prepack": "npm run build && npm run release:consistency:check",
-		"build:standalone": "vite build --config vite.standalone.config.ts --mode webgpu && vite build --config vite.standalone.config.ts --mode wasm"
-	},
-	devDependencies: {
-		"@kubohiroya/turbowarp-camera-source": "^0.25.1",
-		"@kubohiroya/vite-plugin-turbowarp-extension": "^0.11.0",
-		"@teachablemachine/image": "0.8.5",
-		"@teachablemachine/pose": "0.8.6",
-		"@tensorflow-models/posenet": "2.2.2",
-		"@tensorflow-models/speech-commands": "0.5.4",
+//#endregion
+//#region src/package-metadata.ts
+var packageMetadata = {
+	"name": "@kubohiroya/turbowarp-teachable-machine",
+	"version": "4.4.1",
+	"devDependencies": {
 		"@tensorflow/tfjs": "4.22.0",
 		"@tensorflow/tfjs-backend-wasm": "4.22.0",
 		"@tensorflow/tfjs-backend-webgpu": "4.22.0",
-		"@types/node": "^22.20.1",
-		"typescript": "^5.9.3",
-		"vite": "^8.2.2",
-		"vitest": "^4.0.14",
-		"@kubohiroya/turbowarp-extension-data-editor": "^0.11.4"
-	},
-	keywords: [
-		"turbowarp",
-		"scratch",
-		"extension",
-		"pose",
-		"image",
-		"audio",
-		"camera",
-		"teachable-machine"
-	],
-	turbowarpExtension: { "resourceDeclaration": {
-		"schemaVersion": 1,
-		"resources": [
-			{
-				"type": "camera",
-				"usage": "conditional",
-				"purpose": {
-					"en": "Read frames for image or pose recognition",
-					"ja": "画像認識・姿勢認識用に映像を読み取る"
-				},
-				"condition": {
-					"en": "In image or pose recognition mode",
-					"ja": "画像・姿勢認識モードを使う場合"
-				},
-				"via": ["@kubohiroya/turbowarp-camera-source"]
-			},
-			{
-				"type": "microphone",
-				"usage": "conditional",
-				"purpose": {
-					"en": "Read audio segments for sound recognition",
-					"ja": "音声認識用にマイクの音声を読み取る"
-				},
-				"condition": {
-					"en": "In audio recognition mode",
-					"ja": "音声認識モードを使う場合"
-				}
-			},
-			{
-				"type": "network",
-				"usage": "conditional",
-				"purpose": {
-					"en": "Download recognition models and runtime libraries",
-					"ja": "認識モデルと実行ライブラリーを取得する"
-				},
-				"condition": {
-					"en": "When loading a model URL or a runtime not already supplied by the host",
-					"ja": "モデルURLを読み込む場合、またはホストが未提供の実行ライブラリーを読み込む場合"
-				},
-				"data": {
-					"direction": "download",
-					"content": {
-						"en": "Model files and runtime libraries; camera frames and microphone audio are not uploaded by this recognition path",
-						"ja": "モデルファイルと実行ライブラリー。この認識経路はカメラ映像・マイク音声をアップロードしない"
-					}
-				}
-			}
-		]
-	} }
+		"@tensorflow-models/speech-commands": "0.5.4",
+		"@teachablemachine/image": "0.8.5",
+		"@teachablemachine/pose": "0.8.6"
+	}
 };
 //#endregion
 //#region src/extension.ts
@@ -1400,7 +1258,7 @@ function readCameraSource(runtime) {
 	return typeof acquireCamera === "function" ? candidate : void 0;
 }
 var EXTENSION_ID = "kubohiroyatm";
-var VERSION = `${package_default.version}-typescript`;
+var VERSION = `${packageMetadata.version}-typescript`;
 var DOCS_URI = "https://kubohiroya.github.io/turbowarp-teachable-machine/";
 var ACCUMULATED_POSE_CHANGED_EVENT = "TM_ACCUMULATED_POSE_CHANGED";
 var BLOCK_ICON_URI = extensionConfig.blockIconURI;
@@ -1431,7 +1289,7 @@ function mapKeypointsToFrame(keypoints, crop) {
 		};
 	});
 }
-var BROWSER_RUNTIME_URL = `https://cdn.jsdelivr.net/npm/${package_default.name}@${package_default.version}/dist/runtime.js`;
+var BROWSER_RUNTIME_URL = `https://cdn.jsdelivr.net/npm/${packageMetadata.name}@${packageMetadata.version}/dist/runtime.js`;
 var POSITION_ITEMS = [
 	{
 		text: "top left",
@@ -2064,7 +1922,7 @@ var TMExtension = class {
 		if (!cameraSource) return null;
 		const selection = this.resolvedCameraSelection();
 		const options = {
-			owner: package_default.name,
+			owner: packageMetadata.name,
 			cameraId: "pose"
 		};
 		if (selection.kind === "device") options.deviceId = selection.value;

@@ -96,9 +96,10 @@ for (const path of ['docs/index.html', 'docs/ja/index.html']) {
 
 for (const path of ['dist/teachable-machine.js', 'dist/composition.js']) {
   const source = await readFile(path, 'utf8');
-  // Rollup emitted `const version = "x"`, Rolldown inlines it as `version: "x"`.
+  // Rollup emitted `const version = "x"`, Rolldown inlines it as `version: "x"`, and a build-time
+  // definition keeps its JSON spelling `"version": "x"`.
   // Assert the value is embedded, not one bundler's spelling of it.
-  if (!new RegExp(`version\\s*[:=]\\s*"${version.replace(/\./g, '\\.')}"`).test(source)) {
+  if (!new RegExp(`"?version"?\\s*[:=]\\s*"${version.replace(/\./g, '\\.')}"`).test(source)) {
     errors.push(`${path} must embed package version ${version}`);
   }
   // The local binding for package.json differs per bundler; the derivation does not.
@@ -243,7 +244,7 @@ for (const path of ['.github/workflows/ci.yml', '.github/workflows/release.yml']
 
 const poseNetModule = await readFile('dist/posenet.js', 'utf8');
 if (
-  !new RegExp(`version\\s*[:=]\\s*"${version.replace(/\./g, '\\.')}"`).test(poseNetModule) ||
+  !new RegExp(`"?version"?\\s*[:=]\\s*"${version.replace(/\./g, '\\.')}"`).test(poseNetModule) ||
   !/version: [A-Za-z_$][\w$]*(?:_default)?\.version/.test(poseNetModule)
 ) {
   errors.push(`dist/posenet.js must embed package version ${version}`);

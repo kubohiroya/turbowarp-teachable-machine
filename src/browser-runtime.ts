@@ -3,7 +3,7 @@ import * as poseNet from '@tensorflow-models/posenet';
 import * as speechCommands from '@tensorflow-models/speech-commands';
 import * as teachableMachineImage from '@teachablemachine/image';
 import * as teachableMachinePose from '@teachablemachine/pose';
-import packageMetadata from '../package.json' with {type: 'json'};
+import {packageMetadata} from './package-metadata.js';
 import {createRuntimeModelFileLoader} from './runtime-model-loader.js';
 import {
   createComputeRuntime,

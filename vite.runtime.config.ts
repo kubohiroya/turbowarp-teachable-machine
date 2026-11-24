@@ -1,7 +1,9 @@
 import {defineConfig} from 'vite';
 import {resolve} from 'node:path';
+import {packageMetadataDefine} from './package-metadata.config.js';
 
 export default defineConfig({
+  define: packageMetadataDefine,
   // Escape multiline strings in generated code so significant template whitespace
   // cannot appear as trailing whitespace in distribution diffs.
   esbuild: {supported: {'template-literal': false}},

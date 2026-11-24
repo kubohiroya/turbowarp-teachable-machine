@@ -4,6 +4,7 @@ import {defineConfig, type Plugin} from 'vite';
 import {turboWarpExtension} from '@kubohiroya/vite-plugin-turbowarp-extension';
 import {extensionConfig} from './src/config.js';
 import {normalizeBundleIndentation} from './vite-indent-plugin.js';
+import {packageMetadataDefine} from './package-metadata.config.js';
 
 const virtualId = 'virtual:teachable-machine-wasm';
 const resolvedId = `\0${virtualId}`;
@@ -90,6 +91,6 @@ export default defineConfig(async ({mode}) => {
       normalizeBundleIndentation()
     ],
     resolve: {alias: {util: resolve('src/runtime-util-shim.ts')}},
-    define: {__TEACHABLE_MACHINE_DEFAULT_BACKEND__: JSON.stringify(mode)}
+    define: {...packageMetadataDefine, __TEACHABLE_MACHINE_DEFAULT_BACKEND__: JSON.stringify(mode)}
   };
 });

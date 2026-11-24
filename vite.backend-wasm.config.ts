@@ -1,4 +1,5 @@
 import {defineConfig} from 'vite';
+import {packageMetadataDefine} from './package-metadata.config.js';
 
 /**
  * The optional WASM backend resolves TensorFlow.js against the one instance the
@@ -6,6 +7,7 @@ import {defineConfig} from 'vite';
  * never carries a second copy of TensorFlow.js core.
  */
 export default defineConfig({
+  define: packageMetadataDefine,
   build: {
     emptyOutDir: false,
     lib: {

@@ -25,7 +25,7 @@ import type {
   CameraLease,
   CameraSourceRuntime
 } from '@kubohiroya/turbowarp-camera-source/runtime';
-import packageMetadata from '../package.json' with {type: 'json'};
+import {packageMetadata} from './package-metadata.js';
 
 /**
  * Where Camera Source puts itself on the VM runtime.

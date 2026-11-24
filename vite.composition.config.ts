@@ -1,7 +1,9 @@
 import {normalizeBundleIndentation} from './vite-indent-plugin.js';
 import {defineConfig} from 'vite';
+import {packageMetadataDefine} from './package-metadata.config.js';
 
 export default defineConfig({
+  define: packageMetadataDefine,
   plugins: [normalizeBundleIndentation()],
   build: {
     emptyOutDir: false,

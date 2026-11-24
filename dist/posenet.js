@@ -1,7 +1,7 @@
 //#region src/package-metadata.ts
 var packageMetadata = {
 	"name": "@kubohiroya/turbowarp-teachable-machine",
-	"version": "4.4.1",
+	"version": "4.4.2",
 	"devDependencies": {
 		"@tensorflow/tfjs": "4.22.0",
 		"@tensorflow/tfjs-backend-wasm": "4.22.0",

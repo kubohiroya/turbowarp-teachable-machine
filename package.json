@@ -84,7 +84,7 @@
   },
   "devDependencies": {
     "@kubohiroya/turbowarp-camera-source": "^0.25.1",
-    "@kubohiroya/vite-plugin-turbowarp-extension": "^0.11.0",
+    "@kubohiroya/vite-plugin-turbowarp-extension": "^0.12.0",
     "@teachablemachine/image": "0.8.5",
     "@teachablemachine/pose": "0.8.6",
     "@tensorflow-models/posenet": "2.2.2",
